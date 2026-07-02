@@ -1,0 +1,45 @@
+<!-- Template: copy this file to your workspace root as CLAUDE.md and fill in the placeholders. -->
+
+## Workspace
+Owner: `<your name>`, `<your role>`
+What this workspace is: `<one or two lines describing what this workspace is for and how it syncs, e.g. a git repo, an Obsidian vault, a monorepo>`
+Top-level folders: `<folder-1>` `<folder-2>` `<folder-3>` (short description of each)
+
+## Context System
+Tiered retrieval: load what's needed, not everything.
+1. Always loaded: this CLAUDE.md plus any memory files.
+2. Loaded at session start: `context_index.md`, the dashboard of active workstreams.
+3. On demand: `context_<workstream>.md`, loaded only when that workstream is active.
+
+Keep the index to roughly 8 workstreams max. When a context file grows past about 500 lines or 16KB, archive the old material to `context_<workstream>_archive.md` and keep the live file lean. A session-end "wrapup" step writes state back into the relevant context file so the next session starts warm instead of re-deriving it.
+
+## Cross-Cutting Workstreams
+Launching a session from a subfolder loses root context by design. That's correct for a self-contained workstream, but wrong for one that intersects with others (e.g. a workstream that touches both `<workstream-a>` and `<workstream-b>`).
+
+A cross-cutting workstream gets two blocks inside its OWN `<workstream>/CLAUDE.md`:
+- `## Required Reading at Session Start`: a numbered list of backtick-quoted context-file paths to auto-load before doing anything else.
+- `## Write Boundary`: keep deliverables inside this folder; ask before writing into a sibling workstream's folder.
+
+See `templates/crosscutting-CLAUDE.md` for a worked example of both blocks.
+
+## Reference (loaded on demand)
+Keep this file lean. Move large lookup tables, one-off procedures, and rarely-needed reference material into a separate doc, and read it only when the task actually needs it, not on every session start.
+
+## Naming Convention
+Pattern: `[topic]_[what-it-is]_v[N].[ext]`, lowercase, hyphens inside a segment, underscores between segments.
+Example: `webapp_deploy-runbook_v2.md`.
+
+## Worktree Policy
+Any code task touching 3 or more files, or requiring a multi-step plan, uses a git worktree for isolation. Single-file fixes and read-only investigation can stay in the main session.
+
+## Verification Rules
+Verify facts before recommending them: web-search product specs, prices, and versions rather than relying on memory. Never fabricate a fact; state assumptions explicitly or ask instead. Accuracy over completion.
+
+## Workstreams
+Replace these example rows with your own (max 8 workstreams).
+
+| Workstream | Folder | Description |
+|------------|--------|-------------|
+| webapp     | `webapp/`   | `<example: main product codebase and deploy pipeline>` |
+| research   | `research/` | `<example: open research queue and findings>` |
+| ops        | `ops/`      | `<example: infra, monitoring, recurring admin tasks>` |
