@@ -37,7 +37,7 @@ Three beats, about sixty seconds:
 1. **Before.** A fresh session in a project. You ask "where were we?" and get a generic, amnesiac
    answer.
 2. **Install and work.** You set up warmstart (the quickstart below), do a small piece of work, and
-   say "wrap up". The context files update and the change is committed.
+   say "wrap up". The context files update to record where you left off, and that state is committed.
 3. **After.** A brand-new session, first message. The index auto-injects. You ask "where were we?"
    and Claude answers with the current state, the open blocker, and the next action, by name.
 
@@ -62,15 +62,19 @@ forget. Full mechanism in [docs/the-pattern.md](docs/the-pattern.md).
 A warm start in about ten minutes. You need `jq` and `awk` (and `perl` for the em-dash guard), all
 standard on macOS and Linux.
 
-1. **Get the files.** Clone the repo (or, if you already have it locally, copy it into a
-   `warmstart/` folder). Either way you end up with a `warmstart/` directory that contains `hooks/`
-   and `templates/`.
+1. **Get the files.** Run this from your workspace root (the top of the directory you launch Claude
+   Code in), so the `warmstart/` folder lands as a subfolder right there. Every command in the steps
+   below is written relative to that root. Clone the repo, or, if you already have it locally, copy
+   it into a `warmstart/` folder:
 
    ```
    git clone <repo-url> warmstart            # from GitHub, once published
    # or, from a local copy:
    cp -r /path/to/warmstart-source warmstart
    ```
+
+   Either way you end up with a `warmstart/` directory in your workspace root, containing `hooks/`
+   and `templates/`.
 
 2. **Set up your workspace root.** From the top of the directory you launch Claude Code in, create
    two files from the templates:
