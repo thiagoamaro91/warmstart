@@ -160,3 +160,15 @@ session starts cold.
 Rather than estimate, this project measures the wrapup cost on a real session and publishes the
 number as part of the v0.1 release, on the principle that a memory tool should be able to tell you
 what it costs.
+
+Here is that measurement, taken on a real session with a large working context (over 150K tokens).
+The wrapup produced about 32K output tokens and about 67K fresh input tokens, plus roughly 2.6M
+cache-read tokens, the cheap scan side, since re-reading a large session is most of the work. It ran
+in the two layers described above: one orchestrator pass that reads the session and decides what
+changed, then two short parallel writer passes that update the context files. Wall-clock was about
+eight minutes. In list-price terms that is about four US dollars. Two caveats keep the number honest.
+First, this was a deliberately large session; a smaller one reads far less on the scan side and costs
+proportionally less, because the cache-read total tracks how much conversation the wrapup has to
+digest. Second, list-price dollars are the API-style measure: on a subscription plan the same work
+draws down your quota instead of a bill. Read the tokens as the real figure and the dollars as an
+illustration.
