@@ -2,7 +2,7 @@
 
 **Warm starts for Claude Code. Every session begins where the last one ended.**
 
-<!-- A 60-second before/after demo GIF is pinned here at the v0.1 release. -->
+![60-second demo: a fresh session answers "where were we?" by name](docs/demo.gif)
 
 ## The problem
 
@@ -68,7 +68,7 @@ standard on macOS and Linux.
    it into a `warmstart/` folder:
 
    ```
-   git clone <repo-url> warmstart            # from GitHub, once published
+   git clone https://github.com/thiagoamaro91/warmstart.git warmstart
    # or, from a local copy:
    cp -r /path/to/warmstart-source warmstart
    ```
