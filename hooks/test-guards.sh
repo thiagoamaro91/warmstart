@@ -16,7 +16,7 @@ check() { # $1=label $2=actual $3=want
 }
 
 echo "================ syntax check ================"
-for s in block-em-dash.sh block-destructive-bash.sh guard-memory-size.sh; do
+for s in block-em-dash.sh block-destructive-bash.sh guard-memory-size.sh guard-context-index-size.sh; do
   bash -n "$s" && echo "  OK: $s"
 done
 
@@ -61,6 +61,70 @@ printf '%s' "$near" > "$tmp/MEMORY.md"
 jq -nc --arg fp "$tmp/MEMORY.md" --arg o "x"        --arg n "$big" '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$o,new_string:$n}}' | $gms >/dev/null 2>&1; check "Edit growing file past cap blocked" $? 2
 jq -nc --arg fp "$tmp/MEMORY.md" --arg o "$line200" --arg n "z"    '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$o,new_string:$n}}' | $gms >/dev/null 2>&1; check "size-reducing Edit allowed"        $? 0
 rm -r "$tmp"
+
+echo ""
+echo "================ CONTEXT-INDEX-SIZE GUARD ================"
+gcis=./guard-context-index-size.sh
+line2500=$(printf 'a%.0s' $(seq 1 2500))     # over LINE_MAX (2000)
+line200=$(printf 'b%.0s' $(seq 1 200))       # normal dashboard-row length
+
+# WS1: a scratch workspace root (has CLAUDE.md) for the stateless line/region cases.
+ws1=$(mktemp -d)
+printf 'scratch workspace\n' > "$ws1/CLAUDE.md"
+fp1="$ws1/context_index.md"
+
+clean=$'# Context Index\n\n## Active Workstreams\n- example: in progress\n\n## Recently Completed\n- done\n'
+jq -nc --arg fp "$fp1" --arg c "$clean" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}' | $gcis >/dev/null 2>&1; check "clean dashboard Write allowed" $? 0
+
+overline=$(printf '%s\n%s\n' "- normal row" "$line2500")
+jq -nc --arg fp "$fp1" --arg c "$overline" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}' | $gcis >/dev/null 2>&1; check "over-long line Write blocked" $? 2
+
+region_big=$(for _ in $(seq 1 80); do printf '%s\n' "$line200"; done)     # ~16KB, over REGION_CAP (14336)
+above_cap=$(printf '%s\n## Recently Completed\nDone.\n' "$region_big")
+jq -nc --arg fp "$fp1" --arg c "$above_cap" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}' | $gcis >/dev/null 2>&1; check "oversized region-above-marker Write blocked" $? 2
+
+region_small=$(for _ in $(seq 1 10); do printf '%s\n' "$line200"; done)   # ~2KB, under REGION_CAP
+below_big=$(for _ in $(seq 1 100); do printf '%s\n' "$line200"; done)    # ~20KB, but below the marker so it doesn't count
+scoped=$(printf '%s\n## Recently Completed\n%s\n' "$region_small" "$below_big")
+jq -nc --arg fp "$fp1" --arg c "$scoped" '{tool_name:"Write",tool_input:{file_path:$fp,content:$c}}' | $gcis >/dev/null 2>&1; check "small region + large below-marker tail allowed" $? 0
+
+jq -nc --arg fp "$fp1" --arg s "$line2500" '{tool_name:"Edit",tool_input:{file_path:$fp,new_string:$s}}' | $gcis >/dev/null 2>&1; check "over-long line Edit blocked" $? 2
+
+jq -nc --arg fp "$ws1/notes.md" --arg s "$line2500" '{tool_name:"Write",tool_input:{file_path:$fp,content:$s}}' | $gcis >/dev/null 2>&1; check "non-context_index.md file ignored" $? 0
+
+rm "$ws1/CLAUDE.md"
+rmdir "$ws1"
+
+# WS2: on-disk context_index.md whose region above the marker is already over cap.
+ws2=$(mktemp -d)
+printf 'scratch workspace\n' > "$ws2/CLAUDE.md"
+fp2="$ws2/context_index.md"
+printf '%s\n## Recently Completed\nDone.\n' "$region_big" > "$fp2"
+
+jq -nc --arg fp "$fp2" --arg o "x" --arg n "$line200" '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$o,new_string:$n}}' | $gcis >/dev/null 2>&1; check "Edit growing an already-oversized region blocked" $? 2
+jq -nc --arg fp "$fp2" --arg o "$line200" --arg n "x" '{tool_name:"Edit",tool_input:{file_path:$fp,old_string:$o,new_string:$n}}' | $gcis >/dev/null 2>&1; check "size-reducing Edit on oversized region allowed" $? 0
+
+rm "$fp2" "$ws2/CLAUDE.md"
+rmdir "$ws2"
+
+# WS3: nested context_index.md (not the root one) - guarded scope must exclude it.
+ws3=$(mktemp -d)
+printf 'scratch workspace\n' > "$ws3/CLAUDE.md"
+mkdir "$ws3/sub"
+fp3="$ws3/sub/context_index.md"
+jq -nc --arg fp "$fp3" --arg s "$line2500" '{tool_name:"Write",tool_input:{file_path:$fp,content:$s}}' | $gcis >/dev/null 2>&1; check "nested (non-root) context_index.md ignored" $? 0
+
+rm "$ws3/CLAUDE.md"
+rmdir "$ws3/sub"
+rmdir "$ws3"
+
+# WS4: no CLAUDE.md at all; WARMSTART_WORKSPACE_ROOT override must still guard it.
+ws4=$(mktemp -d)
+fp4="$ws4/context_index.md"
+jq -nc --arg fp "$fp4" --arg s "$line2500" '{tool_name:"Write",tool_input:{file_path:$fp,content:$s}}' | WARMSTART_WORKSPACE_ROOT="$ws4" $gcis >/dev/null 2>&1; check "WARMSTART_WORKSPACE_ROOT override guards without a CLAUDE.md" $? 2
+
+rmdir "$ws4"
+
 echo ""
 echo "================ TOTAL: $pass passed, $fail failed ================"
 [ "$fail" -eq 0 ]
