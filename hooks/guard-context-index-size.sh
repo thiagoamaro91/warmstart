@@ -39,7 +39,7 @@ fp=$(printf '%s'   "$input" | jq -r '.tool_input.file_path // empty')
 ROOT="${WARMSTART_WORKSPACE_ROOT:-}"
 if [ -z "$ROOT" ]; then
   search=$(dirname "$fp")
-  while [ -n "$search" ] && [ "$search" != "/" ]; do
+  while [ -n "$search" ] && [ "$search" != "/" ] && [ "$search" != "." ]; do  # "." stops a relative path from looping forever
     if [ -f "$search/CLAUDE.md" ]; then
       ROOT="$search"   # keep climbing; last match wins = outermost
     fi

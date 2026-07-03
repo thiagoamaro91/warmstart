@@ -125,6 +125,9 @@ jq -nc --arg fp "$fp4" --arg s "$line2500" '{tool_name:"Write",tool_input:{file_
 
 rmdir "$ws4"
 
+# A relative file_path must terminate the root climb (dirname ".") instead of looping forever.
+printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"context_index.md","content":"x"}}' | $gcis >/dev/null 2>&1; check "relative path terminates and is ignored" $? 0
+
 echo ""
 echo "================ TOTAL: $pass passed, $fail failed ================"
 [ "$fail" -eq 0 ]
