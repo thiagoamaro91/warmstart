@@ -1,20 +1,158 @@
 # warmstart
 
-Warm starts for Claude Code: a session-continuity system so a new session picks up
-where the last one left off, instead of starting from cold every time.
+**Warm starts for Claude Code. Every session begins where the last one ended.**
 
-> Status: v0.1 in progress. This README is a stub; the full quickstart and the
-> 10-minute promise land with the v0.1 release.
+<!-- A 60-second before/after demo GIF is pinned here at the v0.1 release. -->
 
-## What is here
+## The problem
 
-- `hooks/` - shell hooks that inject your durable context at session start and guard
-  against common mistakes (destructive commands, oversized memory, banned characters).
-- `templates/` - starting-point files you copy into your own workspace: a CLAUDE.md
-  pattern, a context index, and workstream note shapes.
-- `skills/wrapup/` - the end-of-session routine that writes state back to disk so the
-  next session resumes warm.
-- `docs/` - the philosophy and the mechanism behind the pattern.
+Every Claude Code session starts as an amnesiac. You re-explain the project, re-state where you
+were, and re-discover the blocker you already found last time. Compaction eats your context
+mid-task, and ending a session throws its state away.
+
+## The idea
+
+> No database. No embeddings. No server. warmstart's memory is a few markdown files and a shell
+> hook: you can read it, edit it, and `git diff` it.
+
+Every adjacent project pipes session memory into a vector database or a search index. warmstart's
+bet is that an agent's memory should be legible: state a human can audit and correct beats state
+only the machine can query. That is the whole wager, and it is the hill this project stands on.
+
+## What it is, and what it is not
+
+It is for people who use Claude Code daily on real, multi-session work. It was extracted from a
+live system used every day for months, not built as a demo.
+
+It is not a memory database, not RAG, and not a framework. It is plain files plus hooks plus two
+conventions. If you stop using it, your notes are still just markdown. And it does not compete with
+auto-capture memory tools like claude-mem: those keep an automatic log of what happened, while
+warmstart curates what matters now and writes it back at session end. Complementary layers, a log
+and a dashboard. The fuller comparison is in [docs/the-pattern.md](docs/the-pattern.md).
+
+## What it looks like
+
+Three beats, about sixty seconds:
+
+1. **Before.** A fresh session in a project. You ask "where were we?" and get a generic, amnesiac
+   answer.
+2. **Install and work.** You set up warmstart (the quickstart below), do a small piece of work, and
+   say "wrap up". The context files update and the change is committed.
+3. **After.** A brand-new session, first message. The index auto-injects. You ask "where were we?"
+   and Claude answers with the current state, the open blocker, and the next action, by name.
+
+## How it works
+
+Three moving parts:
+
+1. **A session-start hook injects a one-page dashboard.** On the first message of a session,
+   `context-keeper.sh` reads `context_index.md` into the conversation. Claude wakes up knowing the
+   state of every workstream.
+2. **Deep state lives in per-workstream files, loaded only when the topic comes up.** Just-in-time
+   context instead of stuffing everything in up front. This is Anthropic's own published
+   context-engineering guidance; [docs/philosophy.md](docs/philosophy.md) carries the citations.
+3. **A wrapup command writes state back at session end.** What changed, what is blocked, what is
+   next. The loop closes, and the next session starts warm.
+
+The guard hooks make the conventions real: the environment enforces what the model would otherwise
+forget. Full mechanism in [docs/the-pattern.md](docs/the-pattern.md).
+
+## Quickstart
+
+A warm start in about ten minutes. You need `jq` and `awk` (and `perl` for the em-dash guard), all
+standard on macOS and Linux.
+
+1. **Get the files.** Clone the repo (or, if you already have it locally, copy it into a
+   `warmstart/` folder). Either way you end up with a `warmstart/` directory that contains `hooks/`
+   and `templates/`.
+
+   ```
+   git clone <repo-url> warmstart            # from GitHub, once published
+   # or, from a local copy:
+   cp -r /path/to/warmstart-source warmstart
+   ```
+
+2. **Set up your workspace root.** From the top of the directory you launch Claude Code in, create
+   two files from the templates:
+
+   ```
+   cp warmstart/templates/CLAUDE.md.template  ./CLAUDE.md
+   cp warmstart/templates/context_index.md    ./context_index.md
+   ```
+
+   Fill in the workstream table in `CLAUDE.md`, and replace the toy workstreams in
+   `context_index.md` with your own. (If the directory you launch from is not your workspace root,
+   set `WARMSTART_WORKSPACE_ROOT` to the root instead; otherwise the hook finds it by climbing to
+   the outermost `CLAUDE.md`.)
+
+3. **Install the hooks.**
+
+   ```
+   cp -r warmstart/hooks ./hooks
+   chmod +x ./hooks/*.sh
+   ```
+
+4. **Wire them in.** The hooks run through your `.claude/settings.json`. If you do not have one
+   yet, create it straight from the shipped snippet:
+
+   ```
+   mkdir -p .claude
+   cp warmstart/hooks/settings-snippet.json .claude/settings.json
+   ```
+
+   If you already have a `.claude/settings.json`, add the snippet's `UserPromptSubmit` and
+   `PreToolUse` entries into its `hooks` object by hand; the snippet is only a few lines. Every
+   entry points at `$CLAUDE_PROJECT_DIR/hooks/<name>.sh`.
+
+5. **Restart Claude Code.** On the first message of your next session, `context_index.md` is
+   injected automatically. Ask "where were we?" and it answers from the dashboard.
+
+That is tier 2 of the ladder below. To close the loop, add the wrapup skill (tier 3).
+
+## The guard hooks
+
+Five hooks ship. The one to try first is `block-em-dash.sh`: it blocks a single banned character
+(the em-dash, U+2014) on every write, and it exists as a worked example. Open it, change one
+variable near the top, and you have your own rule (a smart-quote range, a curly apostrophe, a
+forbidden word). It is the smallest possible demonstration that the environment can enforce a
+convention the model keeps forgetting.
+
+The rest: `context-keeper.sh` injects your context (above), `block-destructive-bash.sh` blocks
+shell commands that bypass the trash, `guard-memory-size.sh` keeps a `MEMORY.md` under the size
+Claude Code loads at startup, and `guard-context-index-size.sh` keeps the index under the window
+the injector uses. Each hook's behavior, wiring, and its fail-open vs fail-closed choice is in
+[hooks/README.md](hooks/README.md).
+
+## Adoption ladder
+
+You do not have to adopt all of it. Each rung is standalone value.
+
+- **Tier 1 (2 minutes):** install one guard hook, `block-destructive-bash.sh`. Immediate
+  protection, nothing else required.
+- **Tier 2 (10 minutes):** `context-keeper.sh` plus the index template. Sessions start warm. This
+  is the quickstart above.
+- **Tier 3:** the full loop, with the wrapup skill, per-workstream files, and cross-cutting
+  reading lists.
+
+The full value lands for daily Claude Code users juggling two or more workstreams. If you run a
+single project casually, you will probably stop at tier 1, and that is by design: tier 1 is a real
+win on its own, not a failed tier 3.
+
+## Docs
+
+- [docs/philosophy.md](docs/philosophy.md): the methodology (context engineering) and its Anthropic
+  citations.
+- [docs/the-pattern.md](docs/the-pattern.md): how the tiering and the hook actually work, plus the
+  common questions (why files, not a database; how it compares to memory tools; what it costs).
+- [docs/glossary.md](docs/glossary.md): the vocabulary, in plain language.
+
+## Status and origin
+
+v0.1, extracted from a live personal system. It is a working subset, not a finished product: the
+core loop (context injection, templates, guard hooks, a lite wrapup) is here and tested.
+
+Roadmap tease, one line: v0.2 brings the full wrapup pipeline and advanced guard hooks; further out,
+autonomy earned through the same state files.
 
 ## License
 

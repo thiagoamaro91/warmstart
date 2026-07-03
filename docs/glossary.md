@@ -126,6 +126,13 @@ A term from manufacturing for mistake-proofing: shaping a thing so the wrong act
 hard to take. Applied to tools, it means designing arguments so an agent cannot easily misuse them,
 rather than just documenting the pitfalls.
 
+### RAG (retrieval-augmented generation)
+
+A common pattern where an agent answers by first retrieving matching chunks from a search index or
+vector database and pasting them into the prompt. warmstart is deliberately not this: it injects a
+small curated dashboard and loads whole workstream files when the topic comes up, rather than
+retrieving fragments by similarity.
+
 ### Subagent
 
 A separate agent invocation with its own clean context, dispatched to do one bounded piece of work
