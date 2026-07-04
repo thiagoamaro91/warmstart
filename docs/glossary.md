@@ -149,7 +149,7 @@ file. The unit the whole system is organized around.
 
 The end-of-session routine that writes state back to disk: what changed, what is blocked, what is
 next, then commits it. wrapup is what closes the loop, so the next session's [injection](#injection)
-is current. The token-heavy step, and the one that earns the warm start. `wrapup-lite` is the v0.1
+is current. The token-heavy step, and the one that earns the warm start. `wrapup-lite` is the shipped
 version: the core loop only, without the optional enrichment steps.
 
 ### Write Boundary

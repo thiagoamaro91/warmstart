@@ -185,11 +185,12 @@ win on its own, not a failed tier 3.
 
 ## Status and origin
 
-v0.1, extracted from a live personal system. It is a working subset, not a finished product: the
-core loop (context injection, templates, guard hooks, a lite wrapup) is here and tested.
+v0.2, extracted from a live personal system. It is a working subset, not a finished product: the
+core loop (context injection, templates, guard hooks, a lite wrapup) is here and tested, and it now
+installs as a Claude Code plugin in two commands.
 
-Roadmap tease, one line: v0.2 brings the full wrapup pipeline and advanced guard hooks; further out,
-autonomy earned through the same state files.
+Roadmap tease, one line: the next version brings the full wrapup pipeline and advanced guard hooks;
+further out, autonomy earned through the same state files.
 
 ## License
 

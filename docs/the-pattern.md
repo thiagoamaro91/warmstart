@@ -163,7 +163,7 @@ the re-explanation it replaces: you pay once at session end instead of paying ev
 session starts cold.
 
 Rather than estimate, this project measures the wrapup cost on a real session and publishes the
-number as part of the v0.1 release, on the principle that a memory tool should be able to tell you
+number as part of the release, on the principle that a memory tool should be able to tell you
 what it costs.
 
 Here is that measurement, taken on a real session with a large working context (over 150K tokens).
