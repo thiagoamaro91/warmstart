@@ -1,0 +1,13 @@
+{
+  "name": "warmstart",
+  "owner": {
+    "name": "Thiago Amaro"
+  },
+  "plugins": [
+    {
+      "name": "warmstart",
+      "source": "./",
+      "description": "Warm starts for Claude Code: durable session state in a few markdown files, injected on session start and written back at wrapup."
+    }
+  ]
+}

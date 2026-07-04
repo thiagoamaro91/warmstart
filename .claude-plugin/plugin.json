@@ -1,0 +1,10 @@
+{
+  "name": "warmstart",
+  "version": "0.2.0",
+  "description": "Warm starts for Claude Code: durable session state in a few markdown files, injected on session start and written back at wrapup.",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}
