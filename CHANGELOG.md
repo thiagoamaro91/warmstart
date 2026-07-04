@@ -3,11 +3,31 @@
 All notable changes to warmstart are recorded here. The format follows the Keep a Changelog
 convention, and the project aims to follow semantic versioning.
 
-## [Unreleased]
+## [0.2.0] - 2026-07-04
+
+warmstart installs as a Claude Code plugin: two commands in place of the five-step manual setup,
+with the by-hand path kept intact for people who want to own their own wiring.
+
+### Added
+- Plugin manifests: `.claude-plugin/plugin.json` and a self-referencing
+  `.claude-plugin/marketplace.json` (`"source": "./"`), so the repo is its own plugin marketplace.
+- `hooks/hooks.json`: auto-wires the four shipped hooks on install (no `settings.json` to merge, no
+  `chmod`), invoking each as `bash "${CLAUDE_PLUGIN_ROOT}/hooks/<name>.sh"`. It mirrors
+  `hooks/settings-snippet.json` (the manual path) event for event and matcher for matcher.
+- `skills/setup/` (`/warmstart:setup`): writes `CLAUDE.md` and `context_index.md` from the templates
+  on first run, and never overwrites a file that already exists (it prints merge guidance instead).
+- A no-op safety test for the injector: proves `context-keeper.sh` stays silent (empty output, exit
+  0) in any project with no `context_index.md` up-tree, so a user-scope install never disturbs a
+  project that did not adopt warmstart.
+- Dual-door install docs: the README quickstart now leads with the two-command plugin path and keeps
+  the by-hand path as "own your hooks", with a user-vs-project scope note.
 
 ### Removed
 - `hooks/block-em-dash.sh`: the em-dash guard leaves the public set, along with its wiring,
   tests, and doc references. The `perl` dependency goes with it.
+
+### Not yet included
+- The full wrapup pipeline and the advanced guard hooks remain planned for a later version.
 
 ## [0.1] - 2026-07-03
 
