@@ -87,7 +87,9 @@ dashboard.
 
 **Scope.** A default install is user scope, so warmstart is available in every project. That is safe:
 `context-keeper.sh` is a silent no-op in any project with no `context_index.md`, so projects that
-never adopted warmstart are untouched. To confine it to one project, install with `--scope project`.
+never adopted warmstart are untouched. To confine it to one project instead, pick "Project scope" in
+the prompt that `/plugin install` opens, or use the terminal form
+`claude plugin install warmstart@warmstart --scope project`.
 
 ### By hand: own your hooks
 
