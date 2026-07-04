@@ -94,7 +94,6 @@ warmstart/
     block-destructive-bash.sh   blocks a set of dangerous shell commands
     guard-memory-size.sh        keeps memory files from growing past a cap
     guard-context-index-size.sh keeps the index under the injection cap
-    block-em-dash.sh            the swap-in-your-own-rule example (blocks one banned character)
     test-guards.sh              the guard-hook test suite
     settings-snippet.json       the wiring block for your settings.json
     README.md                   what each hook does, and fail-open vs fail-closed

@@ -4,7 +4,7 @@
 # behaviour on missing jq, a block audit log, and `git clean -f` coverage.
 #
 # Fails CLOSED if jq is missing: a guard that cannot parse the command must not
-# silently allow it (contrast the em-dash nudge, which fails open).
+# silently allow it (contrast the write guards, which fail open).
 # Covers: rm with -r and -f (any order/case), find ... -delete, git clean -f.
 # Use `trash` for deletes; stage or stash instead of `git clean`.
 

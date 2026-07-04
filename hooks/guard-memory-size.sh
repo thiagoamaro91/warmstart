@@ -11,7 +11,7 @@
 # always allowed. Only files literally named MEMORY.md are guarded.
 #
 # Fails OPEN if jq is missing (a broken dependency must not hard-block writes).
-# Wired in ~/.claude/settings.json for Write|Edit|MultiEdit, like block-em-dash.
+# Wired in ~/.claude/settings.json for Write|Edit|MultiEdit.
 
 MAX_BYTES=24000
 MAX_LINE=220

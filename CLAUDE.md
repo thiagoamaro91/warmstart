@@ -19,8 +19,8 @@ warmstart. The CLAUDE.md end users install in their own workspace is `templates/
   references, no internal task or gate identifiers.
 - `docs/launch-narrative_PRIVATE.md` is a gitignored private working copy. Never commit it and
   never quote it in tracked files.
-- No literal em-dash (U+2014) anywhere: the repo ships `block-em-dash.sh` and obeys its own rule.
-  Test fixtures spell the character as the six-character JSON escape (backslash, u, 2014).
+- House style: no literal em-dash (U+2014) in any file; use a comma, a colon, parentheses, or a
+  hyphen.
 - No unmeasured numbers in public copy: any token, size, or timing claim comes from a measured run.
 - Copy tone: no hype adjectives; say what warmstart is NOT early; auto-capture memory tools
   (claude-mem is the named, friendly example) are complementary layers, never rivals.
@@ -31,15 +31,15 @@ No build, lint, or package manager; everything is bash, markdown, and JSON. Test
 self-contained scripts, each runnable alone:
 
 ```
-bash hooks/test-guards.sh                       # regression suite for the four PreToolUse guards
+bash hooks/test-guards.sh                       # regression suite for the three PreToolUse guards
 bash hooks/tests/test-context-keeper.sh         # context-keeper smoke test (injection, caps, root resolution)
 bash hooks/tests/test-crosscutting-template.sh  # cross-cutting template integration test
 ```
 
 Run `test-guards.sh` via its file path, never pasted inline: its fixtures contain
 destructive-looking strings, and the live `block-destructive-bash.sh` guard will (correctly) block
-an inline copy. Hooks must run on macOS (BSD userland) and Linux with only bash, jq, and awk, plus
-perl for the em-dash guard; no GNU-only flags.
+an inline copy. Hooks must run on macOS (BSD userland) and Linux with only bash, jq, and awk; no
+GNU-only flags.
 
 ## Architecture
 
@@ -51,7 +51,7 @@ The product is a tiered-context loop (full mechanism in `docs/the-pattern.md`):
 3. `skills/wrapup/` writes state back at session end (inline for small sessions, parallel subagents
    for 2+ independent streams; the agent briefs live in `skills/wrapup/references/`).
 
-Four PreToolUse guard hooks enforce the conventions; `hooks/settings-snippet.json` is the canonical
+Three PreToolUse guard hooks enforce the conventions; `hooks/settings-snippet.json` is the canonical
 wiring. `templates/` holds the files users copy into their own workspace.
 
 Couplings that must move together:

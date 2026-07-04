@@ -3,6 +3,12 @@
 All notable changes to warmstart are recorded here. The format follows the Keep a Changelog
 convention, and the project aims to follow semantic versioning.
 
+## [Unreleased]
+
+### Removed
+- `hooks/block-em-dash.sh`: the em-dash guard leaves the public set, along with its wiring,
+  tests, and doc references. The `perl` dependency goes with it.
+
 ## [0.1] - 2026-07-03
 
 First public release. warmstart is a working subset extracted from a live personal system: the core

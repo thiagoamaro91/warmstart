@@ -59,8 +59,7 @@ forget. Full mechanism in [docs/the-pattern.md](docs/the-pattern.md).
 
 ## Quickstart
 
-A warm start in about ten minutes. You need `jq` and `awk` (and `perl` for the em-dash guard), all
-standard on macOS and Linux.
+A warm start in about ten minutes. You need `jq` and `awk`, both standard on macOS and Linux.
 
 1. **Get the files.** Run this from your workspace root (the top of the directory you launch Claude
    Code in), so the `warmstart/` folder lands as a subfolder right there. Every command in the steps
@@ -115,17 +114,12 @@ That is tier 2 of the ladder below. To close the loop, add the wrapup skill (tie
 
 ## The guard hooks
 
-Five hooks ship. The one to try first is `block-em-dash.sh`: it blocks a single banned character
-(the em-dash, U+2014) on every write, and it exists as a worked example. Open it, change one
-variable near the top, and you have your own rule (a smart-quote range, a curly apostrophe, a
-forbidden word). It is the smallest possible demonstration that the environment can enforce a
-convention the model keeps forgetting.
-
-The rest: `context-keeper.sh` injects your context (above), `block-destructive-bash.sh` blocks
-shell commands that bypass the trash, `guard-memory-size.sh` keeps a `MEMORY.md` under the size
-Claude Code loads at startup, and `guard-context-index-size.sh` keeps the index under the window
-the injector uses. Each hook's behavior, wiring, and its fail-open vs fail-closed choice is in
-[hooks/README.md](hooks/README.md).
+Four hooks ship. The one to try first is `block-destructive-bash.sh`: it blocks shell commands
+that bypass the trash and can wipe uncommitted work, and it is tier 1 of the adoption ladder
+below. The rest: `context-keeper.sh` injects your context (above), `guard-memory-size.sh` keeps a
+`MEMORY.md` under the size Claude Code loads at startup, and `guard-context-index-size.sh` keeps
+the index under the window the injector uses. Each hook's behavior, wiring, and its fail-open vs
+fail-closed choice is in [hooks/README.md](hooks/README.md).
 
 ## Adoption ladder
 

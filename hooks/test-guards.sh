@@ -3,10 +3,6 @@
 #   bash hooks/test-guards.sh
 # Run it via the file path (not an inline command) so the outer invocation does
 # not itself contain destructive strings that would trip the live guard.
-#
-# Em-dash test inputs use the JSON unicode escape backslash-u-2-0-1-4, which jq
-# decodes to the em-dash character at runtime. The test file therefore contains
-# no literal em-dash and stays consistent with the rule it helps enforce.
 cd "$(dirname "$0")" || exit 1
 
 pass=0; fail=0
@@ -16,18 +12,9 @@ check() { # $1=label $2=actual $3=want
 }
 
 echo "================ syntax check ================"
-for s in block-em-dash.sh block-destructive-bash.sh guard-memory-size.sh guard-context-index-size.sh; do
+for s in block-destructive-bash.sh guard-memory-size.sh guard-context-index-size.sh; do
   bash -n "$s" && echo "  OK: $s"
 done
-
-echo ""
-echo "================ EM-DASH GUARD ================"
-printf '%s' '{"tool_name":"Write","tool_input":{"content":"clean text with a - hyphen"}}'                              | ./block-em-dash.sh >/dev/null 2>&1; check "clean Write allowed"       $? 0
-printf '%s' '{"tool_name":"Write","tool_input":{"content":"has an em\u2014dash here"}}'                              | ./block-em-dash.sh >/dev/null 2>&1; check "em-dash Write blocked"      $? 2
-printf '%s' '{"tool_name":"Edit","tool_input":{"new_string":"before\u2014after"}}'                                  | ./block-em-dash.sh >/dev/null 2>&1; check "em-dash Edit blocked"       $? 2
-printf '%s' '{"tool_name":"MultiEdit","tool_input":{"edits":[{"new_string":"ok"},{"new_string":"bad\u2014here"}]}}' | ./block-em-dash.sh >/dev/null 2>&1; check "em-dash MultiEdit blocked" $? 2
-printf '%s' '{"tool_name":"Edit","tool_input":{"new_string":"en\u2013dash is fine"}}'                               | ./block-em-dash.sh >/dev/null 2>&1; check "en-dash U+2013 allowed"    $? 0
-printf '%s' '{"tool_name":"Bash","tool_input":{"command":"ls"}}'                                                      | ./block-em-dash.sh >/dev/null 2>&1; check "Bash tool ignored"        $? 0
 
 echo ""
 echo "================ DESTRUCTIVE BASH GUARD ================"
