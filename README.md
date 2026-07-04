@@ -2,7 +2,7 @@
 
 **Warm starts for Claude Code. Every session begins where the last one ended.**
 
-![60-second demo: a fresh session answers "where were we?" by name](docs/demo.gif)
+![The same brand-new session asked "where were we?" twice. Without warmstart, a blank amnesiac answer; with warmstart, the current workstream, the open blocker, and the next step, by name.](docs/demo.gif)
 
 ## The problem
 
@@ -32,7 +32,7 @@ and a dashboard. The fuller comparison is in [docs/the-pattern.md](docs/the-patt
 
 ## What it looks like
 
-Three beats, about sixty seconds:
+The whole story is three beats:
 
 1. **Before.** A fresh session in a project. You ask "where were we?" and get a generic, amnesiac
    answer.
