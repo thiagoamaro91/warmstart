@@ -16,7 +16,13 @@ dependency is `jq`.
 
 ## Wiring
 
-Copy `hooks/` into your project, then merge `settings-snippet.json` into your
+Two ways, same four hooks.
+
+**As a plugin.** Installing the warmstart plugin auto-wires everything from `hooks.json`; there is
+no `settings.json` to merge and no `chmod`. The plugin invokes each hook as
+`bash "${CLAUDE_PLUGIN_ROOT}/hooks/<name>.sh"`, so wiring never depends on the executable bit.
+
+**By hand.** Copy `hooks/` into your project, then merge `settings-snippet.json` into your
 `.claude/settings.json`. The snippet wires each hook to its event with
 `$CLAUDE_PROJECT_DIR/hooks/<name>.sh`:
 
@@ -25,7 +31,8 @@ Copy `hooks/` into your project, then merge `settings-snippet.json` into your
 - `PreToolUse` matcher `Write|Edit` -> `guard-memory-size.sh`, then `guard-context-index-size.sh`
 
 Make the scripts executable (`chmod +x hooks/*.sh`) and restart Claude Code so it reloads
-`settings.json`.
+`settings.json`. `hooks.json` and `settings-snippet.json` wire the same four hooks the same way; if
+you change one, change the other.
 
 ## Fail-open vs fail-closed
 

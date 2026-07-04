@@ -51,13 +51,19 @@ The product is a tiered-context loop (full mechanism in `docs/the-pattern.md`):
 3. `skills/wrapup/` writes state back at session end (inline for small sessions, parallel subagents
    for 2+ independent streams; the agent briefs live in `skills/wrapup/references/`).
 
-Three PreToolUse guard hooks enforce the conventions; `hooks/settings-snippet.json` is the canonical
-wiring. `templates/` holds the files users copy into their own workspace.
+Three PreToolUse guard hooks enforce the conventions. warmstart ships two doors onto the same set: a
+plugin (`.claude-plugin/plugin.json` plus a self-referencing `marketplace.json`; `hooks/hooks.json`
+auto-wires the hooks on install and `skills/setup/` writes the workspace templates on first run), and
+a manual path (`hooks/settings-snippet.json` is the canonical hand-wiring). `templates/` holds the
+files users copy into their own workspace.
 
 Couplings that must move together:
 
 - The 14336-byte region cap in `guard-context-index-size.sh` is derived from `context-keeper.sh`'s
   16 KB `SOFT_CAP` minus headroom; change one, change the other.
+- `hooks/hooks.json` (plugin wiring) and `hooks/settings-snippet.json` (manual wiring) declare the
+  same four hooks with the same events and matchers; change one, change the other. hooks.json invokes
+  each as `bash "${CLAUDE_PLUGIN_ROOT}/hooks/<name>.sh"` so it never relies on the executable bit.
 - The wrapup skill's Config block (context file names, the 500-line/16KB archive threshold) is
   load-bearing for its steps and must match `templates/`. Guards key on exact file names
   (the workspace-root `context_index.md`, `MEMORY.md`).

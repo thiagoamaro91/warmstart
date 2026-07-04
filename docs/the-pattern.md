@@ -79,6 +79,9 @@ true:
 warmstart/
   README.md                 the what, the pain, the quickstart
   LICENSE                   MIT
+  .claude-plugin/           makes warmstart installable as a Claude Code plugin
+    plugin.json              the plugin manifest (name, version, description)
+    marketplace.json         this repo as its own single-plugin marketplace
   docs/
     philosophy.md           the methodology and its citations
     the-pattern.md          this file: the mechanism
@@ -95,10 +98,13 @@ warmstart/
     guard-memory-size.sh        keeps memory files from growing past a cap
     guard-context-index-size.sh keeps the index under the injection cap
     test-guards.sh              the guard-hook test suite
-    settings-snippet.json       the wiring block for your settings.json
+    hooks.json                  plugin wiring: auto-wires the four hooks on install
+    settings-snippet.json       the same wiring, by hand, for a settings.json
     README.md                   what each hook does, and fail-open vs fail-closed
     tests/                      hook integration tests
   skills/
+    setup/                  first run: writes CLAUDE.md and context_index.md from the templates
+      SKILL.md
     wrapup/                  the end-of-session routine that writes state back
       SKILL.md
       references/            the agent briefs the skill dispatches

@@ -59,7 +59,40 @@ forget. Full mechanism in [docs/the-pattern.md](docs/the-pattern.md).
 
 ## Quickstart
 
-A warm start in about ten minutes. You need `jq` and `awk`, both standard on macOS and Linux.
+A warm start in about ten minutes. You need `jq` and `awk`, both standard on macOS and Linux. Two
+ways in: the plugin (two commands, everything auto-wired) or by hand (you copy the files and own the
+wiring). Both land on the same plain-markdown state.
+
+### The plugin: two commands
+
+In Claude Code, add this repo as a plugin marketplace and install it:
+
+```
+/plugin marketplace add thiagoamaro91/warmstart
+/plugin install warmstart@warmstart
+```
+
+That auto-wires all four hooks (no `settings.json` to merge, no `chmod`) and registers the
+`/warmstart:setup` and `/warmstart:wrapup` skills. Then bootstrap your workspace root:
+
+```
+/warmstart:setup
+```
+
+Setup writes `CLAUDE.md` and `context_index.md` from the templates, and never overwrites a file that
+already exists (it prints merge guidance instead). Fill in the workstream table in `CLAUDE.md`,
+replace the toy workstreams in `context_index.md`, and restart Claude Code. On the first message of
+your next session the index is injected automatically; ask "where were we?" and it answers from the
+dashboard.
+
+**Scope.** A default install is user scope, so warmstart is available in every project. That is safe:
+`context-keeper.sh` is a silent no-op in any project with no `context_index.md`, so projects that
+never adopted warmstart are untouched. To confine it to one project, install with `--scope project`.
+
+### By hand: own your hooks
+
+Prefer to see exactly what lands where, or not use the plugin system at all? Wire the same machinery
+yourself.
 
 1. **Get the files.** Run this from your workspace root (the top of the directory you launch Claude
    Code in), so the `warmstart/` folder lands as a subfolder right there. Every command in the steps
@@ -110,7 +143,9 @@ A warm start in about ten minutes. You need `jq` and `awk`, both standard on mac
 5. **Restart Claude Code.** On the first message of your next session, `context_index.md` is
    injected automatically. Ask "where were we?" and it answers from the dashboard.
 
-That is tier 2 of the ladder below. To close the loop, add the wrapup skill (tier 3).
+Either way you now have the injector and the guard hooks. To close the loop, add the wrapup skill:
+the plugin registers it as `/warmstart:wrapup`; a manual install copies `skills/wrapup/` and runs it
+per its `SKILL.md`.
 
 ## The guard hooks
 
@@ -123,17 +158,19 @@ fail-closed choice is in [hooks/README.md](hooks/README.md).
 
 ## Adoption ladder
 
-You do not have to adopt all of it. Each rung is standalone value.
+You do not have to use all of it. The plugin installs the whole machinery in one step, but the value
+arrives in rungs, and each rung is standalone. The tiers describe how deep you go, not what you
+install.
 
-- **Tier 1 (2 minutes):** install one guard hook, `block-destructive-bash.sh`. Immediate
-  protection, nothing else required.
-- **Tier 2 (10 minutes):** `context-keeper.sh` plus the index template. Sessions start warm. This
-  is the quickstart above.
-- **Tier 3:** the full loop, with the wrapup skill, per-workstream files, and cross-cutting
-  reading lists.
+- **Tier 1:** let one guard hook do its job, `block-destructive-bash.sh`. Immediate protection,
+  nothing else required. (A by-hand install can even stop here and copy just that one hook.)
+- **Tier 2:** keep `context_index.md` current so `context-keeper.sh` injects a real dashboard.
+  Sessions start warm.
+- **Tier 3:** run the full loop, writing state back with the wrapup skill, per-workstream files, and
+  cross-cutting reading lists.
 
 The full value lands for daily Claude Code users juggling two or more workstreams. If you run a
-single project casually, you will probably stop at tier 1, and that is by design: tier 1 is a real
+single project casually, you will probably live at tier 1, and that is by design: tier 1 is a real
 win on its own, not a failed tier 3.
 
 ## Docs
