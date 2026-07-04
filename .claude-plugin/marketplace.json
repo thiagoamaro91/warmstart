@@ -3,6 +3,7 @@
   "owner": {
     "name": "Thiago Amaro"
   },
+  "description": "The warmstart plugin: warm starts for Claude Code, distributed from its own repository.",
   "plugins": [
     {
       "name": "warmstart",
