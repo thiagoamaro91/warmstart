@@ -10,8 +10,9 @@ set -u
 HOOK="$(cd "$(dirname "$0")/.." && pwd)/context-keeper.sh"
 
 WS=$(mktemp -d /tmp/wstest.XXXXXX)
+WS_NOOP=$(mktemp -d /tmp/wstest-noop.XXXXXX)
 SIDS_PREFIX="wstest-$$"
-cleanup() { rm -rf "$WS"; rm -f /tmp/claude-ctx-${SIDS_PREFIX}-*; }
+cleanup() { rm -rf "$WS" "$WS_NOOP"; rm -f /tmp/claude-ctx-${SIDS_PREFIX}-*; }
 trap cleanup EXIT
 
 PASS=0
@@ -111,6 +112,17 @@ unset WARMSTART_WORKSPACE_ROOT
 out=$(run_hook "${SIDS_PREFIX}-s5" "$WS/research")
 assert_contains "$out" "SESSION CONTEXT (auto-loaded by context-keeper):" "fallback: stage1 fires via outermost CLAUDE.md"
 assert_contains "$out" "ACTIVE_MARKER" "fallback: index resolved from detected root"
+export WARMSTART_WORKSPACE_ROOT="$WS"
+
+# Scenario 6: silent no-op, no context_index.md anywhere up the tree
+# WS_NOOP is a bare scratch dir outside WS: no CLAUDE.md and no context_index.md
+# in it or in any ancestor, standing in for a project that never adopted
+# warmstart (the real-world case a user-scope plugin install must stay quiet in).
+unset WARMSTART_WORKSPACE_ROOT
+out=$(run_hook "${SIDS_PREFIX}-s6" "$WS_NOOP")
+rc=$?
+assert_empty "$out" "noop: silent stdout with no context_index.md anywhere up the tree"
+if [ "$rc" -eq 0 ]; then ok "noop: exit code 0"; else bad "noop: exit code 0 (got $rc)"; fi
 export WARMSTART_WORKSPACE_ROOT="$WS"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
