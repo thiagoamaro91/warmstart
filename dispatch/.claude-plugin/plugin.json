@@ -1,0 +1,10 @@
+{
+  "name": "dispatch",
+  "version": "0.1.0",
+  "description": "Subagent dispatch discipline for Claude Code: a guard hook that blocks under-briefed or model-unpinned dispatches, plus the playbook it enforces, injected at session start.",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}
