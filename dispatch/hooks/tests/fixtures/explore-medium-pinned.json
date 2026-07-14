@@ -1,0 +1,8 @@
+{
+  "tool_name": "Agent",
+  "tool_input": {
+    "subagent_type": "Explore",
+    "model": "haiku",
+    "prompt": "Find every place the retry budget is configured in this repo. Look for RETRY_BUDGET, maxRetries, and backoff settings under src/ and config/. Return a markdown table of path:line plus a one-line note on what each site controls. Do not read node_modules."
+  }
+}

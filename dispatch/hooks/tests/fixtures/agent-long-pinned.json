@@ -1,0 +1,8 @@
+{
+  "tool_name": "Agent",
+  "tool_input": {
+    "subagent_type": "general-purpose",
+    "model": "sonnet",
+    "prompt": "OBJECTIVE: Rename the config loader module and update all call sites. CONTEXT: The repo at /tmp/example-repo loads configuration through src/config/loader.js. We decided this session to rename it to src/config/load-config.js to match the naming convention documented in docs/conventions.md. Known call sites: src/app.js, src/server.js, src/cli.js, and test/loader.test.js; there may be more, grep before editing. SCOPE: Do not touch the unrelated logging refactor in src/log/, and do not edit anything under docs/. OUTPUT: Return a markdown list of every file changed with a one-line description of each change, no prose intro. DONE: Run node --test and confirm all tests pass before returning; paste the summary line as evidence."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "tool_name": "Agent",
+  "tool_input": {
+    "subagent_type": "Explore",
+    "model": "haiku",
+    "prompt": "Find where the retry budget is configured. Return a table of path:line."
+  }
+}
