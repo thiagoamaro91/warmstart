@@ -175,6 +175,15 @@ The full value lands for daily Claude Code users juggling two or more workstream
 single project casually, you will probably live at tier 1, and that is by design: tier 1 is a real
 win on its own, not a failed tier 3.
 
+## Also in this marketplace: dispatch
+
+This repo doubles as a plugin marketplace, and it ships a second, independent plugin:
+[dispatch](dispatch/README.md). Where warmstart guards what a session remembers, dispatch guards
+what one agent hands to another: a PreToolUse hook blocks subagent dispatches that are
+under-briefed or don't pick a model, and a SessionStart hook injects the playbook it enforces.
+Same thesis, different moment. Install it with `/plugin install dispatch@warmstart`; the two
+plugins share nothing but the repo.
+
 ## Docs
 
 - [docs/philosophy.md](docs/philosophy.md): the methodology (context engineering) and its Anthropic

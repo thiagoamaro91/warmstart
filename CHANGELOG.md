@@ -3,6 +3,22 @@
 All notable changes to warmstart are recorded here. The format follows the Keep a Changelog
 convention, and the project aims to follow semantic versioning.
 
+## [Unreleased]
+
+### Added
+- The `dispatch` plugin, a second plugin distributed from the same marketplace
+  (`/plugin install dispatch@warmstart`). It enforces subagent dispatch discipline:
+  - `dispatch/hooks/guard-agent-briefing.js`, a PreToolUse guard on `Task|Agent` that blocks
+    (exit 2) dispatches whose prompt is under 500 characters (200 for Explore/Plan; a literal
+    `[brief-ok]` in the prompt waives the length check) and dispatches without an explicit
+    `model` pin (on by default; set `DISPATCH_REQUIRE_MODEL_PIN=0` to turn the pin rule off;
+    `[brief-ok]` never waives it). The block message carries the five-part briefing template so
+    the model can re-issue immediately. Written in Node with no dependencies (no bash, no jq),
+    so it runs on Windows as-is.
+  - `dispatch/docs/dispatch-playbook.md`, the seven-rule playbook the guard enforces rules 1-2
+    of, injected as session context by a SessionStart hook so users don't edit their CLAUDE.md.
+  - A fixture-driven regression suite: `node dispatch/hooks/tests/test-dispatch-hooks.js`.
+
 ## [0.2.0] - 2026-07-04
 
 warmstart installs as a Claude Code plugin: two commands in place of the five-step manual setup,
