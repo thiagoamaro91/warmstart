@@ -3,12 +3,17 @@
   "owner": {
     "name": "Thiago Amaro"
   },
-  "description": "The warmstart plugin: warm starts for Claude Code, distributed from its own repository.",
+  "description": "The warmstart marketplace: warm starts and dispatch discipline for Claude Code, distributed from one repository.",
   "plugins": [
     {
       "name": "warmstart",
       "source": "./",
       "description": "Warm starts for Claude Code: durable session state in a few markdown files, injected on session start and written back at wrapup."
+    },
+    {
+      "name": "dispatch",
+      "source": "./dispatch",
+      "description": "Subagent dispatch discipline: a guard hook that blocks under-briefed or model-unpinned dispatches, plus the playbook it enforces, injected at session start."
     }
   ]
 }
