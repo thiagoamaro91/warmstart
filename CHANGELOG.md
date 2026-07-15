@@ -19,6 +19,19 @@ convention, and the project aims to follow semantic versioning.
   - `dispatch/docs/dispatch-playbook.md`, the seven-rule playbook the guard enforces rules 1-2
     of, injected as session context by a SessionStart hook so users don't edit their CLAUDE.md.
   - A fixture-driven regression suite: `node dispatch/hooks/tests/test-dispatch-hooks.js`.
+- The `workflows` plugin, a third plugin distributed from the same marketplace
+  (`/plugin install workflows@warmstart`). It teaches the fan-out-and-verify multi-agent pattern:
+  - `workflows/examples/review-fanout.workflow.js`, a complete, self-contained Workflow script.
+    It fans out one cheap (`haiku`) finder agent per review dimension in parallel, dedupes their
+    findings by normalized title, then hands each candidate to three skeptic agents on the
+    expensive (`opus`) tier prompted to REFUTE it, and upholds a finding only if at least two of
+    the three cannot. Deterministic: no clock or random source. `export const meta` is a pure
+    literal.
+  - `workflows/skills/fanout-review/SKILL.md`, a thin skill that runs the bundled script via the
+    Workflow tool with `scriptPath` resolved from the plugin root.
+  - A dependency-free regression test: `node workflows/tests/test-workflows-chapter.js` (parses the
+    workflow script, checks the meta and skill frontmatter, and scans for em-dashes and leaked
+    private terms).
 
 ## [0.2.0] - 2026-07-04
 

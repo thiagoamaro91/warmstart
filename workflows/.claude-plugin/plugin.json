@@ -1,0 +1,10 @@
+{
+  "name": "workflows",
+  "version": "0.1.0",
+  "description": "Fan-out-and-verify multi-agent workflows for Claude Code: cheap finder agents review in parallel, expensive skeptic agents adversarially verify, and only findings that survive refutation are reported.",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}

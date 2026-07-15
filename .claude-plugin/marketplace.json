@@ -14,6 +14,11 @@
       "name": "dispatch",
       "source": "./dispatch",
       "description": "Subagent dispatch discipline: a guard hook that blocks under-briefed or model-unpinned dispatches, plus the playbook it enforces, injected at session start."
+    },
+    {
+      "name": "workflows",
+      "source": "./workflows",
+      "description": "Fan-out-and-verify multi-agent workflows: cheap finder agents review in parallel, expensive skeptic agents adversarially verify, and only findings that survive refutation are reported."
     }
   ]
 }
