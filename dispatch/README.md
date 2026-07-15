@@ -32,7 +32,8 @@ enforces what the model would otherwise forget. Two moving parts:
    Claude gets the dispatch right on the first try instead of after a block.
 
 The hooks are plain Node.js scripts with no dependencies: no bash, no jq, nothing to `chmod`. They
-run the same on Windows, macOS, and Linux.
+run the same on Windows, macOS, and Linux. The one thing they need is Node.js itself; see the
+install notes below.
 
 ## What the guard enforces
 
@@ -73,6 +74,11 @@ warmstart) and install the plugin:
 Restart Claude Code. That is the whole setup: the guard and the playbook injection are auto-wired,
 and there is no step three.
 
+One prerequisite: the hooks run on Node.js, and Claude Code does not bundle a `node` executable
+(its official installers ship a self-contained binary). If `node --version` fails in your
+terminal, install the LTS from [nodejs.org](https://nodejs.org) first. Without it the hooks
+don't block anything; Claude Code reports the failed hook command and carries on.
+
 ### Never used Claude Code? Windows, from zero
 
 1. **Install Claude Code.** Open PowerShell (press the Windows key, type `powershell`, press
@@ -85,7 +91,11 @@ and there is no step three.
    No admin rights needed. If anything looks different on your machine, the canonical
    instructions live at [code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup).
 
-2. **Start it.** Close and reopen PowerShell, go to the folder you work in (for example
+2. **Install Node.js.** The plugin's hooks are Node scripts, and Claude Code does not include
+   Node. Download the LTS installer from [nodejs.org](https://nodejs.org) and click through it;
+   the defaults are fine.
+
+3. **Start Claude Code.** Close and reopen PowerShell, go to the folder you work in (for example
    `cd Documents\my-project`), and run:
 
    ```powershell
@@ -94,17 +104,17 @@ and there is no step three.
 
    The first run walks you through logging in.
 
-3. **Install the plugin.** Inside Claude Code, type the two `/plugin` commands from the top of
+4. **Install the plugin.** Inside Claude Code, type the two `/plugin` commands from the top of
    this section, one at a time, then restart Claude Code (type `exit`, then run `claude` again).
 
-4. **See it work.** Ask Claude something that takes real digging in a decent-sized project, like
+5. **See it work.** Ask Claude something that takes real digging in a decent-sized project, like
    "search the whole project and list everything that reads configuration". When it dispatches a
    subagent for the legwork, the guard checks the dispatch; if the briefing is too thin, Claude
    gets blocked, reads the template in the error, and re-issues a proper briefing by itself. You
    will see it happen in the tool log.
 
-The hooks run on Node.js, which Claude Code provides. If a hook ever reports that `node` is
-missing, install the LTS version from [nodejs.org](https://nodejs.org) and restart your terminal.
+If a hook ever reports that `node` is missing, step 2 was skipped: install the LTS version from
+[nodejs.org](https://nodejs.org) and restart your terminal.
 
 ## The playbook
 

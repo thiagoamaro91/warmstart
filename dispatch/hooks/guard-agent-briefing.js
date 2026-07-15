@@ -10,7 +10,7 @@
 // deliberately tiny dispatch; it waives the length check only, never the pin.
 //
 // Written in Node, not bash: no jq or POSIX shell dependency, so it runs on
-// Windows as-is. Claude Code ships with Node available.
+// Windows as-is. The only runtime it needs is a node executable on PATH.
 //
 // Config: set DISPATCH_REQUIRE_MODEL_PIN to "0", "false", or "off" to disable
 // the model-pin rule. The briefing-length rule is the always-on core.
