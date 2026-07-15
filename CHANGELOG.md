@@ -14,7 +14,8 @@ convention, and the project aims to follow semantic versioning.
     `model` pin (on by default; set `DISPATCH_REQUIRE_MODEL_PIN=0` to turn the pin rule off;
     `[brief-ok]` never waives it). The block message carries the five-part briefing template so
     the model can re-issue immediately. Written in Node with no dependencies (no bash, no jq),
-    so it runs on Windows as-is.
+    so it runs on Windows as-is; the one prerequisite is a `node` executable on PATH, which
+    Claude Code does not bundle.
   - `dispatch/docs/dispatch-playbook.md`, the seven-rule playbook the guard enforces rules 1-2
     of, injected as session context by a SessionStart hook so users don't edit their CLAUDE.md.
   - A fixture-driven regression suite: `node dispatch/hooks/tests/test-dispatch-hooks.js`.
