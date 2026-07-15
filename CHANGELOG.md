@@ -6,6 +6,22 @@ convention, and the project aims to follow semantic versioning.
 ## [Unreleased]
 
 ### Added
+- The `skill-tuner` plugin, a third plugin distributed from the same marketplace
+  (`/plugin install skill-tuner@warmstart`). It is an evidence-driven improvement loop for your
+  own skills and hooks: you hand it an evidence file, it derives and verifies findings, and it
+  splits them into a safe tier (wording-only changes, auto-applied and committed) and a gated tier
+  (anything that changes behavior, written up with a ready-to-apply diff for human review).
+  - `skill-tuner/skills/skill-tuner/SKILL.md`, the loop itself, with two modes:
+    `run --evidence <path> [--dry-run]` (the batch pass) and `review` (walk the gated punch list
+    interactively). State lives in a `.skill-tuner/` directory at the workspace root (ledger,
+    per-run report, last-run summary).
+  - A dependency-free Node test: `node skill-tuner/tests/test-skill-tuner-chapter.js`, which checks
+    the SKILL.md frontmatter, that no file carries a literal em-dash, and that no personal residue
+    survived extraction.
+  - Extracted from a private version and cut back to what is generic. The private evidence
+    collector (bound to one memory-tool database and one machine's log layout), its headless
+    launcher, and a notification integration tied to the author's own infrastructure are not
+    included; you supply the evidence file, skill-tuner does the reasoning.
 - The `dispatch` plugin, a second plugin distributed from the same marketplace
   (`/plugin install dispatch@warmstart`). It enforces subagent dispatch discipline:
   - `dispatch/hooks/guard-agent-briefing.js`, a PreToolUse guard on `Task|Agent` that blocks

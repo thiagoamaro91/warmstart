@@ -14,6 +14,11 @@
       "name": "dispatch",
       "source": "./dispatch",
       "description": "Subagent dispatch discipline: a guard hook that blocks under-briefed or model-unpinned dispatches, plus the playbook it enforces, injected at session start."
+    },
+    {
+      "name": "skill-tuner",
+      "source": "./skill-tuner",
+      "description": "An evidence-driven improvement loop for your skills and hooks: findings in, safe fixes auto-applied, risky ones gated behind human review."
     }
   ]
 }
