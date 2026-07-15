@@ -49,7 +49,7 @@ phase. That is trust, not a blank cheque:
 
 ## Start every run by laying down the rails
 
-The phases below are not a suggestion you hold in your head for 40 messages.
+The phases below are not a suggestion you hold in your head across a long run.
 **Create one TodoWrite item per phase you'll actually run** (skip phases a head
 doesn't use, e.g. Isolate for non-code). This is what keeps the loop from
 quietly losing a step on a long run. Then announce: the detected head, whether
