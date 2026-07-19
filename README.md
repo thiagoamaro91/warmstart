@@ -175,9 +175,9 @@ The full value lands for daily Claude Code users juggling two or more workstream
 single project casually, you will probably live at tier 1, and that is by design: tier 1 is a real
 win on its own, not a failed tier 3.
 
-## Also in this marketplace: dispatch and runbooks
+## Also in this marketplace: dispatch, runbooks, skill-tuner, autonomous, and workflows
 
-This repo doubles as a plugin marketplace, and it ships two more independent plugins.
+This repo doubles as a plugin marketplace, and it ships five more independent plugins.
 
 [dispatch](dispatch/README.md): where warmstart guards what a session remembers, dispatch guards
 what one agent hands to another: a PreToolUse hook blocks subagent dispatches that are
@@ -189,7 +189,20 @@ Same thesis, different moment. Install it with `/plugin install dispatch@warmsta
 Mermaid diagram). Skills as plain-text runbooks, readable in full before you run them. Install it
 with `/plugin install runbooks@warmstart`.
 
-The three plugins share nothing but the repo; take any subset.
+[skill-tuner](skill-tuner/README.md): an evidence-driven improvement loop for your own skills and
+hooks. You hand it an evidence file, it derives and verifies findings, then splits them into a safe
+tier (wording-only changes, auto-applied) and a gated tier (anything that changes behavior, written
+up for human review). Install it with `/plugin install skill-tuner@warmstart`.
+
+[autonomous](autonomous/README.md): drive one task end to end heads-down, research grounding at the
+front and adversarial review at the back, across code, decisions, documents, or strategy. Two
+checkpoints, four produce-heads. Install it with `/plugin install autonomous@warmstart`.
+
+[workflows](workflows/README.md): a fan-out-and-verify pattern for multi-agent review, with a
+runnable example that spreads independent finders across dimensions and then has skeptic agents try
+to refute each finding before it is reported. Install it with `/plugin install workflows@warmstart`.
+
+The six plugins share nothing but the repo; take any subset.
 
 ## Docs
 

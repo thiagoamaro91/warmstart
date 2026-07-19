@@ -1,0 +1,10 @@
+{
+  "name": "skill-tuner",
+  "version": "0.1.0",
+  "description": "An evidence-driven improvement loop for your Claude Code skills and hooks: findings in, safe fixes auto-applied, risky ones gated behind human review.",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}

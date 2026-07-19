@@ -19,6 +19,11 @@
       "name": "runbooks",
       "source": "./runbooks",
       "description": "Two pure-markdown procedure skills: forcing-questions (adversarial 'is this worth building' interrogation before any design work) and spec-diagram (specs that lead with a Mermaid diagram, plus the palette and v11 syntax safety net to make them render)."
+    },
+    {
+      "name": "skill-tuner",
+      "source": "./skill-tuner",
+      "description": "An evidence-driven improvement loop for your skills and hooks: findings in, safe fixes auto-applied, risky ones gated behind human review."
     }
   ]
 }
