@@ -98,6 +98,7 @@ const files = walk(chapterRoot);
   // substrings. Labels are reconstructed from the fragments at runtime.
   const wholeWord = [
     ['mi', 'ni'],
+    ['mo', 'shi'],
   ];
   const substrings = [
     ['linked', 'in-pro'],
@@ -113,6 +114,18 @@ const files = walk(chapterRoot);
     ['ali', 'ne'],
     ['mad', 'rid'],
     ['pra', 'gue'],
+    // Private-infrastructure markers, assembled from fragments like the rest so
+    // the contiguous literal never appears here. The bare author name is
+    // intentionally absent: the public repo slug is legitimate identity, and the
+    // dot in the launch-agent label is a literal (not a wildcard) so it cannot
+    // match the slash in the public homepage URL.
+    ['646', '1016449'],
+    ['launch', 'agent'],
+    ['com', '\\.thi', 'ago'],
+    ['claude-code', '-token'],
+    ['/Us', 'ers/'],
+    ['iCl', 'oud'],
+    ['Mobile ', 'Documents'],
   ];
 
   const patterns = [];
