@@ -7,9 +7,11 @@
 //     A Workflow script is neither plain CommonJS nor a plain ES module: it
 //     combines `export const meta` (ESM only) with top-level `await`/`return`
 //     (illegal in an ES module, illegal in CommonJS respectively), so a raw
-//     `node --check` cannot validate it either way. We instead strip the
-//     `export` keyword and compile the remaining body with the AsyncFunction
-//     constructor, which parses top-level await/return without executing.
+//     `node --check` is unreliable here: depending on the Node version it may
+//     report success without actually validating the top-level await/return
+//     semantics. We instead strip the `export` keyword and compile the
+//     remaining body with the AsyncFunction constructor, which parses
+//     top-level await/return without executing.
 //  2. its `meta` block is a pure literal with a name and description.
 //  3. skills/fanout-review/SKILL.md frontmatter parses with name + description.
 //  4. no literal em-dash (U+2014) in any chapter file.
@@ -127,6 +129,17 @@ const banned = [
   { label: 'aline', re: /aline/i },
   { label: 'madrid', re: /madrid/i },
   { label: 'prague', re: /prague/i },
+  // Private-infrastructure markers: the pieces a chapter is expected to leave
+  // behind. `thiago` is deliberately absent: the public repo slug
+  // `thiagoamaro91/warmstart` is intentional identity, not residue.
+  { label: 'moshi', re: /\bmoshi\b/i },
+  { label: 'launchagent', re: /launchagent/i },
+  { label: 'com.thiago', re: /com\.thiago/i },
+  { label: 'claude-code-token', re: /claude-code-token/i },
+  { label: 'chat-id 6461016449', re: /6461016449/ },
+  { label: '/Users/ path', re: /\/Users\// },
+  { label: 'icloud path', re: /icloud/i },
+  { label: 'Mobile Documents path', re: /mobile documents/i },
 ];
 const leaks = [];
 for (const f of allFiles) {

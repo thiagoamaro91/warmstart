@@ -41,9 +41,11 @@ Workflow tool runs; the pieces map straight onto the idea above.
   returns a structured list of findings validated against a JSON schema, so the shape is
   guaranteed rather than parsed out of prose.
 - **Dedupe.** `dedupe(...)` merges every finder's list, collapsing findings with the same
-  normalized title into one candidate and keeping the highest severity seen. It is deterministic:
-  first appearance wins, order is preserved, and there is no clock or random source anywhere in the
-  script, so the same input yields the same run.
+  normalized title into one candidate and keeping the highest severity seen. The merge is
+  deterministic given the finders' outputs: first appearance wins, order is preserved, and the
+  dedupe step reads no clock or random source. The run as a whole is not deterministic, because the
+  `agent(...)` calls that feed it are model calls; the point is that the merge adds no extra
+  nondeterminism of its own.
 - **Verify phase.** For each candidate the script runs three skeptic agents on the expensive tier
   (`model: 'opus'`), each prompted to refute the finding. All skeptic calls across all findings go
   out in one `parallel(...)` batch. A candidate is upheld only if at least two of its three
