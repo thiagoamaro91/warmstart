@@ -175,14 +175,21 @@ The full value lands for daily Claude Code users juggling two or more workstream
 single project casually, you will probably live at tier 1, and that is by design: tier 1 is a real
 win on its own, not a failed tier 3.
 
-## Also in this marketplace: dispatch
+## Also in this marketplace: dispatch and skill-tuner
 
-This repo doubles as a plugin marketplace, and it ships a second, independent plugin:
-[dispatch](dispatch/README.md). Where warmstart guards what a session remembers, dispatch guards
+This repo doubles as a plugin marketplace, and it ships two more independent plugins.
+
+[dispatch](dispatch/README.md): where warmstart guards what a session remembers, dispatch guards
 what one agent hands to another: a PreToolUse hook blocks subagent dispatches that are
 under-briefed or don't pick a model, and a SessionStart hook injects the playbook it enforces.
-Same thesis, different moment. Install it with `/plugin install dispatch@warmstart`; the two
-plugins share nothing but the repo.
+Same thesis, different moment. Install it with `/plugin install dispatch@warmstart`.
+
+[skill-tuner](skill-tuner/README.md): an evidence-driven improvement loop for your own skills and
+hooks. You hand it an evidence file, it derives and verifies findings, then splits them into a safe
+tier (wording-only changes, auto-applied) and a gated tier (anything that changes behavior, written
+up for human review). Install it with `/plugin install skill-tuner@warmstart`.
+
+The three plugins share nothing but the repo; take any subset.
 
 ## Docs
 
