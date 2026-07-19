@@ -22,6 +22,19 @@ convention, and the project aims to follow semantic versioning.
     collector (bound to one memory-tool database and one machine's log layout), its headless
     launcher, and a notification integration tied to the author's own infrastructure are not
     included; you supply the evidence file, skill-tuner does the reasoning.
+- The `autonomous` plugin, a third plugin distributed from the same marketplace
+  (`/plugin install autonomous@warmstart`). It ships the `/autonomous` skill, which
+  drives a whole task end to end through one research-grounded loop with adversarial
+  verification at both ends and exactly two human checkpoints:
+  - `autonomous/skills/autonomous/SKILL.md`, the shared skeleton (Triage, Recon, Frame,
+    Plan, Isolate, Produce, Verify, Critique, Ship, Persist) with four interchangeable
+    heads (code, decision, document, strategy) and `--type`, `--deep`, `--no-research`
+    flags.
+  - `autonomous/skills/autonomous/references/produce-heads.md`, the per-head detail for
+    the three phases that vary (Produce, Verify, Critique).
+  - A dependency-free Node test: `node autonomous/tests/test-autonomous-chapter.js`,
+    which checks the SKILL.md frontmatter, bans the literal em-dash, and runs a
+    sanitization sweep over the chapter.
 - The `dispatch` plugin, a second plugin distributed from the same marketplace
   (`/plugin install dispatch@warmstart`). It enforces subagent dispatch discipline:
   - `dispatch/hooks/guard-agent-briefing.js`, a PreToolUse guard on `Task|Agent` that blocks

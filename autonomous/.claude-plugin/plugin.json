@@ -1,0 +1,10 @@
+{
+  "name": "autonomous",
+  "version": "0.1.0",
+  "description": "Drive a task end to end autonomously: one research-grounded loop with adversarial review at both ends and two human checkpoints, across code, decisions, documents, or strategy.",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}

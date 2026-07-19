@@ -24,6 +24,11 @@
       "name": "skill-tuner",
       "source": "./skill-tuner",
       "description": "An evidence-driven improvement loop for your skills and hooks: findings in, safe fixes auto-applied, risky ones gated behind human review."
+    },
+    {
+      "name": "autonomous",
+      "source": "./autonomous",
+      "description": "Drive a task end to end autonomously: one research-grounded loop with adversarial review at both ends and two human checkpoints, across code, decisions, documents, or strategy."
     }
   ]
 }
