@@ -54,7 +54,7 @@ tool such as claude-mem. The shape it reads:
   "generated_at_epoch": 1700000000,
   "window_from_epoch": 1699395200,
   "hook_fires":       [{ "ts": "", "reason": "", "command": "" }],
-  "skill_invocations": { "example-skill": 3 },
+  "skill_invocations": { "<skill-name>": 3 },
   "transcript_blocks": [{ "file": "", "excerpt": "" }],
   "observations":      [{ "type": "", "title": "", "subtitle": "" }]
 }

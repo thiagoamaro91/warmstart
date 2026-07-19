@@ -36,6 +36,20 @@ const RESIDUE = [
   ['aline', /aline/i],
   ['madrid', /madrid/i],
   ['prague', /prague/i],
+  // Markers of the three pieces cut during extraction (evidence collector,
+  // headless launcher, notification integration) plus private-path fragments.
+  // The chapter's de-personalization contract is that none of these ship;
+  // this guards against a future edit reintroducing them. `thiago` is NOT
+  // listed on purpose: the public repo slug `thiagoamaro91/warmstart` is
+  // intentional identity that legitimately appears in the chapter files.
+  ['moshi (whole word)', /\bmoshi\b/i],
+  ['launchagent', /launchagent/i],
+  ['com.thiago', /com\.thiago/i],
+  ['claude-code-token', /claude-code-token/i],
+  ['chat-id 6461016449', /6461016449/],
+  ['/Users/ path', /\/Users\//],
+  ['icloud path', /icloud/i],
+  ['Mobile Documents path', /mobile documents/i],
 ];
 
 let ran = 0;
