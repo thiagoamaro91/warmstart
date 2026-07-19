@@ -1,0 +1,10 @@
+{
+  "name": "runbooks",
+  "version": "0.1.0",
+  "description": "Two pure-markdown procedure skills: forcing-questions (adversarial 'is this worth building' interrogation before any design work) and spec-diagram (specs that lead with a Mermaid diagram, plus the palette and v11 syntax safety net to make them render).",
+  "author": {
+    "name": "Thiago Amaro"
+  },
+  "homepage": "https://github.com/thiagoamaro91/warmstart",
+  "license": "MIT"
+}

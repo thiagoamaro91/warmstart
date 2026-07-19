@@ -14,6 +14,11 @@
       "name": "dispatch",
       "source": "./dispatch",
       "description": "Subagent dispatch discipline: a guard hook that blocks under-briefed or model-unpinned dispatches, plus the playbook it enforces, injected at session start."
+    },
+    {
+      "name": "runbooks",
+      "source": "./runbooks",
+      "description": "Two pure-markdown procedure skills: forcing-questions (adversarial 'is this worth building' interrogation before any design work) and spec-diagram (specs that lead with a Mermaid diagram, plus the palette and v11 syntax safety net to make them render)."
     }
   ]
 }
