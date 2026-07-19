@@ -6,7 +6,7 @@ convention, and the project aims to follow semantic versioning.
 ## [Unreleased]
 
 ### Added
-- The `skill-tuner` plugin, a third plugin distributed from the same marketplace
+- The `skill-tuner` plugin, also distributed from the same marketplace
   (`/plugin install skill-tuner@warmstart`). It is an evidence-driven improvement loop for your
   own skills and hooks: you hand it an evidence file, it derives and verifies findings, and it
   splits them into a safe tier (wording-only changes, auto-applied and committed) and a gated tier
@@ -22,7 +22,7 @@ convention, and the project aims to follow semantic versioning.
     collector (bound to one memory-tool database and one machine's log layout), its headless
     launcher, and a notification integration tied to the author's own infrastructure are not
     included; you supply the evidence file, skill-tuner does the reasoning.
-- The `autonomous` plugin, a third plugin distributed from the same marketplace
+- The `autonomous` plugin, also distributed from the same marketplace
   (`/plugin install autonomous@warmstart`). It ships the `/autonomous` skill, which
   drives a whole task end to end through one research-grounded loop with adversarial
   verification at both ends and exactly two human checkpoints:
@@ -48,7 +48,7 @@ convention, and the project aims to follow semantic versioning.
   - `dispatch/docs/dispatch-playbook.md`, the seven-rule playbook the guard enforces rules 1-2
     of, injected as session context by a SessionStart hook so users don't edit their CLAUDE.md.
   - A fixture-driven regression suite: `node dispatch/hooks/tests/test-dispatch-hooks.js`.
-- The `runbooks` plugin, a third plugin distributed from the same marketplace
+- The `runbooks` plugin, also distributed from the same marketplace
   (`/plugin install runbooks@warmstart`): two pure-markdown procedure skills extracted from the
   author's live setup, no hooks and no scripts.
   - `runbooks/skills/forcing-questions/`, adversarial demand interrogation for "is this worth
@@ -60,6 +60,19 @@ convention, and the project aims to follow semantic versioning.
     colour discipline, the
     Mermaid v11 syntax-trap list, and a validate-then-export workflow. The two Mermaid MCP
     servers it can use are optional, with a `@mermaid-js/mermaid-cli` fallback documented.
+- The `workflows` plugin, also distributed from the same marketplace
+  (`/plugin install workflows@warmstart`). It teaches the fan-out-and-verify multi-agent pattern:
+  - `workflows/examples/review-fanout.workflow.js`, a complete, self-contained Workflow script.
+    It fans out one cheap (`haiku`) finder agent per review dimension in parallel, dedupes their
+    findings by normalized title, then hands each candidate to three skeptic agents on the
+    expensive (`opus`) tier prompted to REFUTE it, and upholds a finding only if at least two of
+    the three cannot. Deterministic: no clock or random source. `export const meta` is a pure
+    literal.
+  - `workflows/skills/fanout-review/SKILL.md`, a thin skill that runs the bundled script via the
+    Workflow tool with `scriptPath` resolved from the plugin root.
+  - A dependency-free regression test: `node workflows/tests/test-workflows-chapter.js` (parses the
+    workflow script, checks the meta and skill frontmatter, and scans for em-dashes and leaked
+    private terms).
 
 ## [0.2.0] - 2026-07-04
 

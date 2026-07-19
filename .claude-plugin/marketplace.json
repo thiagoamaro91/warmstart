@@ -29,6 +29,11 @@
       "name": "autonomous",
       "source": "./autonomous",
       "description": "Drive a task end to end autonomously: one research-grounded loop with adversarial review at both ends and two human checkpoints, across code, decisions, documents, or strategy."
+    },
+    {
+      "name": "workflows",
+      "source": "./workflows",
+      "description": "Fan-out-and-verify multi-agent workflows: cheap finder agents review in parallel, expensive skeptic agents adversarially verify, and only findings that survive refutation are reported."
     }
   ]
 }
