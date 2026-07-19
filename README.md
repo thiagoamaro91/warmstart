@@ -175,14 +175,21 @@ The full value lands for daily Claude Code users juggling two or more workstream
 single project casually, you will probably live at tier 1, and that is by design: tier 1 is a real
 win on its own, not a failed tier 3.
 
-## Also in this marketplace: dispatch
+## Also in this marketplace: dispatch and runbooks
 
-This repo doubles as a plugin marketplace, and it ships a second, independent plugin:
-[dispatch](dispatch/README.md). Where warmstart guards what a session remembers, dispatch guards
+This repo doubles as a plugin marketplace, and it ships two more independent plugins.
+
+[dispatch](dispatch/README.md): where warmstart guards what a session remembers, dispatch guards
 what one agent hands to another: a PreToolUse hook blocks subagent dispatches that are
 under-briefed or don't pick a model, and a SessionStart hook injects the playbook it enforces.
-Same thesis, different moment. Install it with `/plugin install dispatch@warmstart`; the two
-plugins share nothing but the repo.
+Same thesis, different moment. Install it with `/plugin install dispatch@warmstart`.
+
+[runbooks](runbooks/README.md): two pure-markdown procedure skills, forcing-questions
+(adversarial "is this worth building" interrogation) and spec-diagram (specs that lead with a
+Mermaid diagram). Skills as plain-text runbooks, readable in full before you run them. Install it
+with `/plugin install runbooks@warmstart`.
+
+The three plugins share nothing but the repo; take any subset.
 
 ## Docs
 

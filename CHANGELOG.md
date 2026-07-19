@@ -19,6 +19,18 @@ convention, and the project aims to follow semantic versioning.
   - `dispatch/docs/dispatch-playbook.md`, the seven-rule playbook the guard enforces rules 1-2
     of, injected as session context by a SessionStart hook so users don't edit their CLAUDE.md.
   - A fixture-driven regression suite: `node dispatch/hooks/tests/test-dispatch-hooks.js`.
+- The `runbooks` plugin, a third plugin distributed from the same marketplace
+  (`/plugin install runbooks@warmstart`): two pure-markdown procedure skills extracted from the
+  author's live setup, no hooks and no scripts.
+  - `runbooks/skills/forcing-questions/`, adversarial demand interrogation for "is this worth
+    building" decisions: six forcing questions asked one at a time, explicit anti-sycophancy
+    rules, and a closing verdict (build the wedge / reshape / do not build) plus one concrete
+    assignment. Forked from the gstack `office-hours` skill's product diagnostic core.
+  - `runbooks/skills/spec-diagram/`, specs that lead with an embedded Mermaid diagram: the
+    concept-to-pattern matrix, the dual-mode warm-dark gold palette (pastel fills) with 60-30-10
+    colour discipline, the
+    Mermaid v11 syntax-trap list, and a validate-then-export workflow. The two Mermaid MCP
+    servers it can use are optional, with a `@mermaid-js/mermaid-cli` fallback documented.
 
 ## [0.2.0] - 2026-07-04
 
