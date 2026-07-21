@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: Test suites (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Linux exercises GNU userland; macOS exercises BSD userland and bash 3.2,
+        # which the hooks promise to support.
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard hook regression suite
+        run: bash hooks/test-guards.sh
+      - name: Context-keeper smoke test
+        run: bash hooks/tests/test-context-keeper.sh
+      - name: Cross-cutting template integration test
+        run: bash hooks/tests/test-crosscutting-template.sh
+      - name: Dispatch briefing-guard fixture suite
+        run: node dispatch/hooks/tests/test-dispatch-hooks.js
+      - name: Skill-tuner chapter checks
+        run: node skill-tuner/tests/test-skill-tuner-chapter.js
+      - name: Autonomous chapter checks
+        run: node autonomous/tests/test-autonomous-chapter.js
+      - name: Workflows chapter checks
+        run: node workflows/tests/test-workflows-chapter.js
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint all shell scripts at warning severity
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck -S warning
+
+  structure:
+    name: Structure lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate every tracked JSON file
+        run: |
+          rc=0
+          while IFS= read -r -d '' f; do
+            if ! jq empty "$f"; then
+              echo "Invalid JSON: $f"
+              rc=1
+            fi
+          done < <(git ls-files -z '*.json')
+          exit "$rc"
+      - name: Ban the literal em-dash (house style)
+        run: |
+          if grep -rIn --exclude-dir=.git "$(printf '\342\200\224')" . ; then
+            echo "Literal em-dash (U+2014) found; house style forbids it."
+            exit 1
+          fi
+          echo "No literal em-dash in tracked files."

@@ -160,6 +160,8 @@ if [ -n "$CWD" ] && [ -d "$CWD" ] && [ -n "$WORKSPACE_ROOT" ]; then
           while IFS= read -r p; do
             [ -z "$p" ] && continue
             # Resolve path: ~ expansion, absolute paths kept, otherwise relative to WS_DIR
+            # The quoted ~/ below is a literal prefix match on config text, expanded manually in the branch.
+            # shellcheck disable=SC2088
             case "$p" in
               "~/"*) RESOLVED="$HOME/${p#"~/"}" ;;
               "/"*)  RESOLVED="$p" ;;

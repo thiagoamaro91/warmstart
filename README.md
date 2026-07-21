@@ -1,5 +1,7 @@
 # warmstart
 
+[![CI](https://github.com/thiagoamaro91/warmstart/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagoamaro91/warmstart/actions/workflows/ci.yml)
+
 **Warm starts for Claude Code. Every session begins where the last one ended.**
 
 ![The same brand-new session asked "where were we?" twice. Without warmstart, a blank amnesiac answer; with warmstart, the current workstream, the open blocker, and the next step, by name.](docs/demo.gif)
