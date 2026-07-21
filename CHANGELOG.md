@@ -5,6 +5,15 @@ convention, and the project aims to follow semantic versioning.
 
 ## [Unreleased]
 
+### Fixed
+- `hooks/block-destructive-bash.sh`: a backslash before an ordinary character is a
+  shell no-op, so `\rm -rf`, `r\m -rf`, and similar alias-suppression idioms ran the
+  real command while dodging every boundary-anchored matcher in the file (they all
+  require `rm`, `find`, or `git clean` to appear literally). The hook now normalizes
+  a copy of the command (stripping backslashes before alphanumerics) and matches
+  against that copy, while the audit log still records what was actually typed.
+  Regression cases added to `hooks/test-guards.sh`.
+
 ### Added
 - The `skill-tuner` plugin, also distributed from the same marketplace
   (`/plugin install skill-tuner@warmstart`). It is an evidence-driven improvement loop for your
