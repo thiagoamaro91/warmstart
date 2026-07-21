@@ -5,7 +5,14 @@ convention, and the project aims to follow semantic versioning.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-21
+
 ### Added
+- Continuous integration: `.github/workflows/ci.yml` runs on every push and pull request to
+  `main`. It executes all seven test suites on both Linux and macOS (the two userlands the hooks
+  promise to support), lints every tracked shell script with shellcheck at warning severity,
+  validates every tracked JSON file with jq, and fails on any literal em-dash in tracked files.
+  The README now carries the CI status badge.
 - The `skill-tuner` plugin, also distributed from the same marketplace
   (`/plugin install skill-tuner@warmstart`). It is an evidence-driven improvement loop for your
   own skills and hooks: you hand it an evidence file, it derives and verifies findings, and it
