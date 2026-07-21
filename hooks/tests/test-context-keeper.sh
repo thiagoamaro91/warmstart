@@ -11,8 +11,10 @@ HOOK="$(cd "$(dirname "$0")/.." && pwd)/context-keeper.sh"
 
 WS=$(mktemp -d /tmp/wstest.XXXXXX)
 WS_NOOP=$(mktemp -d /tmp/wstest-noop.XXXXXX)
+OUTSIDE_DIR=$(mktemp -d /tmp/wstest-outside.XXXXXX)
+TILDE_HOME=$(mktemp -d /tmp/wstest-tildehome.XXXXXX)
 SIDS_PREFIX="wstest-$$"
-cleanup() { rm -rf "$WS" "$WS_NOOP"; rm -f /tmp/claude-ctx-${SIDS_PREFIX}-*; }
+cleanup() { rm -rf "$WS" "$WS_NOOP" "$OUTSIDE_DIR" "$TILDE_HOME"; rm -f /tmp/claude-ctx-${SIDS_PREFIX}-*; }
 trap cleanup EXIT
 
 PASS=0
@@ -43,6 +45,39 @@ cat > "$WS/research/CLAUDE.md" <<'EOF'
 Keep deliverables in this folder.
 EOF
 printf 'RESEARCH_NOTES_MARKER: sample note body.\n' > "$WS/research/notes.md"
+
+# Confinement fixtures (Defect 1): a workstream whose Required Reading block
+# lists an absolute path outside WORKSPACE_ROOT, a "../" escape, a legitimate
+# in-workspace file, and a nonexistent file, all in one CLAUDE.md.
+printf 'OUTSIDE_SECRET_MARKER: should never be inlined.\n' > "$OUTSIDE_DIR/secret.md"
+mkdir -p "$WS/confine"
+cat > "$WS/confine/CLAUDE.md" <<EOF
+# Confine workstream
+
+## Required Reading at Session Start
+1. Read \`$OUTSIDE_DIR/secret.md\` for background.
+2. Read \`../../../../../etc/hostname\` for background.
+3. Read \`inside.md\` for background.
+4. Read \`missing.md\` for background.
+
+## Write Boundary
+Keep deliverables in this folder.
+EOF
+printf 'CONFINE_INSIDE_MARKER: legit in-workspace file.\n' > "$WS/confine/inside.md"
+
+# Tilde fixture (Defect 2): WORKSPACE_ROOT sits under a throwaway HOME so a
+# "~/"-prefixed Required Reading path both exercises tilde expansion and
+# stays inside WORKSPACE_ROOT (confinement would otherwise skip it).
+WS_TILDE="$TILDE_HOME/workspace"
+mkdir -p "$WS_TILDE/proj"
+printf '# Tilde Workspace\n' > "$WS_TILDE/CLAUDE.md"
+cat > "$WS_TILDE/proj/CLAUDE.md" <<'EOF'
+# Tilde workstream
+
+## Required Reading at Session Start
+1. Read `~/workspace/tilde-notes.md` for background.
+EOF
+printf 'TILDE_NOTES_MARKER: tilde expansion works.\n' > "$WS_TILDE/tilde-notes.md"
 
 small_index() {
   cat > "$WS/context_index.md" <<'EOF'
@@ -124,6 +159,22 @@ rc=$?
 assert_empty "$out" "noop: silent stdout with no context_index.md anywhere up the tree"
 if [ "$rc" -eq 0 ]; then ok "noop: exit code 0"; else bad "noop: exit code 0 (got $rc)"; fi
 export WARMSTART_WORKSPACE_ROOT="$WS"
+
+# Scenario 7: path confinement (Defect 1) - absolute-outside and "../"-escape
+# Required Reading paths are skipped and reported, legit/missing paths behave
+# exactly as before.
+out=$(run_hook "${SIDS_PREFIX}-s7" "$WS/confine")
+assert_contains "$out" "[SKIPPED $OUTSIDE_DIR/secret.md: outside WORKSPACE_ROOT ($WS)" "confine: absolute path outside root is skipped and reported"
+assert_absent  "$out" "OUTSIDE_SECRET_MARKER" "confine: absolute-outside file content never inlined"
+assert_contains "$out" "[SKIPPED /etc/hostname: outside WORKSPACE_ROOT ($WS)" "confine: relative ../ escape is skipped and reported"
+assert_contains "$out" "CONFINE_INSIDE_MARKER" "confine: legitimate in-workspace file still inlined"
+assert_contains "$out" "[MISSING: $WS/confine/missing.md]" "confine: nonexistent in-workspace path still reports MISSING"
+
+# Scenario 8: tilde expansion (Defect 2) - a "~/"-prefixed path inside
+# WORKSPACE_ROOT resolves and inlines instead of reporting MISSING.
+out=$(HOME="$TILDE_HOME" WARMSTART_WORKSPACE_ROOT="$WS_TILDE" run_hook "${SIDS_PREFIX}-s8" "$WS_TILDE/proj")
+assert_contains "$out" "TILDE_NOTES_MARKER" "tilde: ~/-prefixed path resolves and inlines"
+assert_absent  "$out" "MISSING" "tilde: no MISSING marker for the ~/-prefixed path"
 
 printf '\n%d passed, %d failed\n' "$PASS" "$FAIL"
 rc=0

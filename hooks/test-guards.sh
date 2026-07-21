@@ -27,6 +27,25 @@ printf '%s' '{"tool_input":{"command":"git clean -n"}}'           | ./block-dest
 printf '%s' '{"tool_input":{"command":"chmod -R 755 dir"}}'       | ./block-destructive-bash.sh >/dev/null 2>&1; check "chmod -R allowed"             $? 0
 printf '%s' '{"tool_input":{"command":"ls -la"}}'                 | ./block-destructive-bash.sh >/dev/null 2>&1; check "ls allowed"                   $? 0
 
+# Command-name evasions (path-prefixed, backslash-escaped, quote-preceded).
+printf '%s' '{"tool_input":{"command":"/bin/rm -rf /tmp/x"}}'    | ./block-destructive-bash.sh >/dev/null 2>&1; check "path-prefixed /bin/rm -rf blocked" $? 2
+jq -nc --arg c '\rm -rf /tmp/x'         '{tool_input:{command:$c}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "backslash-escaped rm -rf blocked"  $? 2
+jq -nc --arg c "sh -c 'rm -rf /tmp/x'"  '{tool_input:{command:$c}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "quote-preceded rm -rf blocked"     $? 2
+jq -nc --arg c 'X=rm; $X -rf /tmp/x'    '{tool_input:{command:$c}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "var-indirection rm (documented gap, not blocked)" $? 0
+
+# ${IFS}/$IFS word-splitting evasions.
+jq -nc --arg c 'rm${IFS}-rf${IFS}/tmp/pwned' '{tool_input:{command:$c}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "IFS-joined rm -rf blocked"  $? 2
+jq -nc --arg c 'rm -r${IFS}-f /tmp/x'        '{tool_input:{command:$c}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "IFS-split rm -r -f blocked" $? 2
+
+# Flag-scoping false positives: a -r/-f-looking flag on a LATER command must not trip the rm/git-clean check.
+printf '%s' '{"tool_input":{"command":"rm notes.txt; grep -rf pattern.txt logs/"}}' | ./block-destructive-bash.sh >/dev/null 2>&1; check "rm then grep -rf not blocked"        $? 0
+printf '%s' '{"tool_input":{"command":"rm a.txt; ls -alrtF"}}'                      | ./block-destructive-bash.sh >/dev/null 2>&1; check "rm then ls -alrtF not blocked"      $? 0
+printf '%s' '{"tool_input":{"command":"git clean -n && tar -xf a.tar"}}'            | ./block-destructive-bash.sh >/dev/null 2>&1; check "git clean -n then tar -xf not blocked" $? 0
+
+# Previously-correct non-blocks must stay allowed.
+printf '%s' '{"tool_input":{"command":"rm x && tar -xzf a.tgz"}}'   | ./block-destructive-bash.sh >/dev/null 2>&1; check "rm then tar -xzf still allowed"  $? 0
+printf '%s' '{"tool_input":{"command":"rm x && docker rm -f c"}}'   | ./block-destructive-bash.sh >/dev/null 2>&1; check "rm then docker rm -f still allowed" $? 0
+
 echo ""
 echo "================ MEMORY-SIZE GUARD ================"
 gms=./guard-memory-size.sh

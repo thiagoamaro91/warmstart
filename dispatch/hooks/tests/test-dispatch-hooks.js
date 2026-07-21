@@ -93,6 +93,26 @@ check('Explore gets the 200-char minimum: under 200 blocked',
   run(guard, fixture('explore-short-pinned.json')), 2,
   ['under-briefed', 'minimum 200', 'subagent_type=Explore']);
 
+// --- guard-agent-briefing.js, length is CHARACTERS not bytes ---
+
+check('167-char CJK prompt (501 UTF-8 bytes) is blocked: gate counts characters',
+  run(guard, fixture('agent-unicode-charcount-pinned.json')), 2,
+  ['under-briefed', 'minimum 500']);
+
+check('499-char ASCII prompt blocked',
+  run(guard, fixture('agent-ascii-499-pinned.json')), 2,
+  ['under-briefed', 'minimum 500']);
+
+check('501-char ASCII prompt passes',
+  run(guard, fixture('agent-ascii-501-pinned.json')), 0);
+
+check('Explore: 199-char prompt blocked',
+  run(guard, fixture('explore-ascii-199-pinned.json')), 2,
+  ['under-briefed', 'minimum 200']);
+
+check('Explore: 201-char prompt passes',
+  run(guard, fixture('explore-ascii-201-pinned.json')), 0);
+
 // --- guard-agent-briefing.js, pin toggle off ---
 
 for (const off of ['0', 'false', 'OFF']) {

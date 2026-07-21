@@ -138,14 +138,45 @@ if [ -n "$CWD" ] && [ -d "$CWD" ] && [ -n "$WORKSPACE_ROOT" ]; then
           TOTAL_BYTES=0
           MAX_BYTES=$((200 * 1024))  # 200KB cap across all required-reading files
 
+          # Collapse "." and ".." segments in an absolute-ish path without
+          # touching the filesystem, so a Required Reading path can be
+          # confined to WORKSPACE_ROOT even when it doesn't exist yet.
+          # No realpath dependency: it's not guaranteed present/GNU-compatible
+          # on macOS, and this hook must stay bash+jq+awk only.
+          normalize_path() {
+            local input="$1" part normalized=""
+            local IFS=/
+            set -- $input
+            for part in "$@"; do
+              case "$part" in
+                ""|".") continue ;;
+                "..") normalized="${normalized%/*}" ;;
+                *)     normalized="$normalized/$part" ;;
+              esac
+            done
+            printf '%s\n' "${normalized:-/}"
+          }
+
           while IFS= read -r p; do
             [ -z "$p" ] && continue
             # Resolve path: ~ expansion, absolute paths kept, otherwise relative to WS_DIR
             case "$p" in
-              "~/"*) RESOLVED="$HOME/${p#~/}" ;;
+              "~/"*) RESOLVED="$HOME/${p#"~/"}" ;;
               "/"*)  RESOLVED="$p" ;;
               "./"*) RESOLVED="$WS_DIR/${p#./}" ;;
               *)     RESOLVED="$WS_DIR/$p" ;;
+            esac
+
+            # Confine to the workspace: normalize away ./.. segments and
+            # reject anything that resolves outside WORKSPACE_ROOT rather
+            # than inlining it silently.
+            RESOLVED=$(normalize_path "$RESOLVED")
+            case "$RESOLVED" in
+              "$WORKSPACE_ROOT"/*) : ;;
+              *)
+                echo "[SKIPPED $RESOLVED: outside WORKSPACE_ROOT ($WORKSPACE_ROOT), not inlined]"
+                continue
+                ;;
             esac
 
             # Skip files already auto-loaded by the harness

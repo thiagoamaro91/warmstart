@@ -74,6 +74,50 @@ convention, and the project aims to follow semantic versioning.
     workflow script, checks the meta and skill frontmatter, and scans for em-dashes and leaked
     private terms).
 
+### Security
+- `hooks/block-destructive-bash.sh`: the `rm` guard matched only the bare token `rm`, so
+  path-prefixed (`/bin/rm`), backslash-escaped (`\rm`), and quote-preceded (`sh -c 'rm ...'`)
+  invocations passed unblocked; the command-name match now covers those forms. `${IFS}` and `$IFS`
+  word-splitting also evaded the guard entirely, in both the fully-joined and partial forms; both
+  are now normalized to a space before matching. `hooks/README.md` now documents the guard's actual
+  scope: it stops accidents and offers no defense against deliberate evasion, since variable
+  indirection (`X=rm; $X -rf`), `eval`, `echo | sh`, and interpreter one-liners remain out of reach
+  by design, as an inherent limit of matching patterns against unexpanded command text.
+- `hooks/context-keeper.sh`: Required Reading paths were resolved with no confinement, so a
+  workstream CLAUDE.md could name any file the user could read and have it inlined into session
+  context. Resolved paths are now normalized and skipped with a report if they fall outside the
+  workspace root. Implemented in pure bash rather than with `realpath`, which errors on nonexistent
+  paths and resolves symlinks in a way that breaks containment comparisons on macOS.
+
+### Fixed
+- `hooks/block-destructive-bash.sh`: the recursive and force flag checks scanned the entire command
+  string rather than the `rm` invocation's own arguments, so unrelated commands sharing a line were
+  falsely blocked (for example `rm notes.txt; grep -rf pattern.txt logs/`). Flags are now tested
+  only against the segment where the command name matched; the same fix applies to the `git clean`
+  force check.
+- `hooks/context-keeper.sh`: `~/`-prefixed Required Reading paths never resolved, because the tilde
+  in `${p#~/}` was expanded on the pattern side rather than the value side. They now resolve
+  correctly.
+- `dispatch/hooks/guard-agent-briefing.js`: the briefing length gate measured UTF-8 bytes while
+  reporting and documenting characters. It now counts characters; for ASCII prompts the behavior is
+  unchanged.
+- `workflows/examples/review-fanout.workflow.js`: finding titles were normalized to ASCII before
+  deduplication, so a title written in a non-Latin script normalized to empty and the finding was
+  dropped silently. Normalization is now Unicode aware, and anything that still normalizes to empty
+  is logged rather than discarded quietly.
+- Regression coverage: `hooks/test-guards.sh` (37 cases), `hooks/tests/test-context-keeper.sh` (21
+  cases), `hooks/tests/test-crosscutting-template.sh` (3 cases), and
+  `dispatch/hooks/tests/test-dispatch-hooks.js` (24 cases) all pass, with a new case added for every
+  bypass and false positive listed above and five new fixtures added for the briefing gate
+  boundaries.
+
+### Changed
+- `workflows/examples/review-fanout.workflow.js`: a failed or malformed skeptic response was
+  counted as a vote that a finding survived scrutiny. Skeptic outcomes are now three-way (upheld,
+  refuted, invalid), invalid results count toward neither side, and the published output carries
+  the effective skeptic count. This is a behavior change: a finding whose valid votes cannot reach
+  the uphold threshold is now excluded as insufficiently scrutinized rather than published.
+
 ## [0.2.0] - 2026-07-04
 
 warmstart installs as a Claude Code plugin: two commands in place of the five-step manual setup,

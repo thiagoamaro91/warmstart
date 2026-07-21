@@ -75,7 +75,7 @@ requirement is a visible, deliberate choice, never inheritance.
 // Deliberate short dispatch, waved through by the orchestrator.
 if (prompt.includes('[brief-ok]')) process.exit(0);
 
-const len = Buffer.byteLength(prompt, 'utf8');
+const len = [...prompt].length;
 
 // Explore/Plan are read-only recon agents; short, precise prompts are more
 // often legitimate there. Everything else must carry a real briefing.
