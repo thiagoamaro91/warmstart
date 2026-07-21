@@ -19,8 +19,14 @@ fi
 CMD=$(jq -r '.tool_input.command // empty')
 [ -n "$CMD" ] || exit 0
 
+# Command-name de-obfuscation: a backslash before an ordinary char is a shell
+# no-op, so \rm, r\m, \g\it run the plain command while dodging the boundary-
+# anchored matchers below. Normalize a copy and match against it.
+CMD_RAW="$CMD"
+CMD=$(printf '%s' "$CMD" | sed -E 's/\\([[:alnum:]])/\1/g')
+
 block() {
-  echo "$(date '+%F %T') BLOCKED: $1 :: $CMD" >>"$LOG"
+  echo "$(date '+%F %T') BLOCKED: $1 :: $CMD_RAW" >>"$LOG"
   echo "BLOCKED: $1" >&2
   exit 2
 }

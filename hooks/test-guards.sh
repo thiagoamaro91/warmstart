@@ -27,6 +27,12 @@ printf '%s' '{"tool_input":{"command":"git clean -n"}}'           | ./block-dest
 printf '%s' '{"tool_input":{"command":"chmod -R 755 dir"}}'       | ./block-destructive-bash.sh >/dev/null 2>&1; check "chmod -R allowed"             $? 0
 printf '%s' '{"tool_input":{"command":"ls -la"}}'                 | ./block-destructive-bash.sh >/dev/null 2>&1; check "ls allowed"                   $? 0
 
+# Backslash de-obfuscation bypass (a backslash before an ordinary char is a shell
+# no-op: \rm and r\m still run plain rm, but used to dodge the boundary-anchored
+# matchers). Regression for the fix that normalizes CMD before matching.
+printf '%s' '{"tool_input":{"command":"\\rm -rf /tmp/x"}}'       | ./block-destructive-bash.sh >/dev/null 2>&1; check "\\rm -rf blocked"              $? 2
+printf '%s' '{"tool_input":{"command":"r\\m -rf /tmp/x"}}'       | ./block-destructive-bash.sh >/dev/null 2>&1; check "r\\m -rf blocked"              $? 2
+
 echo ""
 echo "================ MEMORY-SIZE GUARD ================"
 gms=./guard-memory-size.sh
