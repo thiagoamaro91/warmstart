@@ -58,7 +58,7 @@ const SKEPTICS_PER_FINDING = 3
 const UPHOLD_THRESHOLD = 2
 
 function normalize(title) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  return title.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
 }
 
 // Merge findings from every finder into one list, collapsing near-duplicates
@@ -72,7 +72,15 @@ function dedupe(perDimension) {
   for (const group of perDimension) {
     for (const f of group.findings) {
       const key = normalize(f.title)
-      if (!key) continue
+      // A key of "" means the title had no letters or digits at all (e.g. an
+      // empty string, or punctuation-only like "!!!"), not a non-Latin title:
+      // normalize() keeps any Unicode letter or number, so CJK/Cyrillic/Greek
+      // titles produce a real key here. Log instead of silently dropping, so
+      // a schema-valid finding with a degenerate title still leaves a trace.
+      if (!key) {
+        log(`Skipping a finding with no usable title (dimension: ${group.dimension}, raw title: ${JSON.stringify(f.title)}).`)
+        continue
+      }
       if (!byKey.has(key)) {
         byKey.set(key, { ...f, dimensions: [group.dimension] })
         order.push(key)
@@ -160,19 +168,43 @@ const votes = await parallel(
       label: `verify:${job.finding.id}:${job.k + 1}`,
       phase: 'Verify',
       schema: SKEPTIC_SCHEMA,
-    }).then((r) => ({ id: job.finding.id, refuted: !!(r && r.refuted), rationale: r && r.rationale }))
+    }).then((r) => {
+      // A falsy or non-conforming result (transient error, schema miss) is
+      // NOT a vote that the finding survived scrutiny; it is a vote nobody
+      // cast. Track it as its own outcome so it can neither uphold nor
+      // refute the finding.
+      const valid = !!r && typeof r.refuted === 'boolean'
+      const verdict = !valid ? 'invalid' : r.refuted ? 'refuted' : 'upheld'
+      return { id: job.finding.id, verdict, rationale: r && r.rationale }
+    })
   )
 )
 
-const upheldBy = new Map()
-for (const c of candidates) upheldBy.set(c.id, 0)
+const tally = new Map()
+for (const c of candidates) tally.set(c.id, { upheld: 0, refuted: 0, invalid: 0 })
 for (const v of votes) {
-  if (!v.refuted) upheldBy.set(v.id, upheldBy.get(v.id) + 1)
+  tally.get(v.id)[v.verdict]++
 }
 
-const upheld = candidates
-  .filter((c) => upheldBy.get(c.id) >= UPHOLD_THRESHOLD)
-  .map((c) => ({ ...c, upheldVotes: upheldBy.get(c.id), skeptics: SKEPTICS_PER_FINDING }))
+const upheld = []
+for (const c of candidates) {
+  const t = tally.get(c.id)
+  const effectiveSkeptics = SKEPTICS_PER_FINDING - t.invalid
+  if (t.invalid > 0) {
+    log(`Finding ${c.id} ("${c.title}"): ${t.invalid} of ${SKEPTICS_PER_FINDING} skeptic call(s) came back invalid; only ${effectiveSkeptics} reached a real verdict.`)
+  }
+  // Explicit tie-break: if too many skeptics failed to reach a verdict, the
+  // remaining ones can no longer mathematically clear UPHOLD_THRESHOLD, and
+  // the finding is treated as not upheld rather than as refuted (it was
+  // never actually attacked enough times to say either).
+  if (effectiveSkeptics < UPHOLD_THRESHOLD) {
+    log(`Finding ${c.id} cannot be upheld: insufficient scrutiny (${effectiveSkeptics}/${SKEPTICS_PER_FINDING} skeptics reached a verdict, ${UPHOLD_THRESHOLD} needed).`)
+    continue
+  }
+  if (t.upheld >= UPHOLD_THRESHOLD) {
+    upheld.push({ ...c, upheldVotes: t.upheld, skeptics: SKEPTICS_PER_FINDING, effectiveSkeptics })
+  }
+}
 
 log(`Upheld ${upheld.length} of ${candidates.length} finding(s) after adversarial verification.`)
 return { findings: candidates, upheld }
